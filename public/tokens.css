@@ -9,3 +9,13 @@
 	--shadow1: rgb(58, 67, 40);
 	--drag-handle: rgba(83, 83, 83, 1);
 }
+:root {
+	--mhw-background: rgb(76, 77, 88);
+	--mhw-on-background: rgb(233, 243, 242);
+	--mhw-surface: rgb(113, 114, 94);
+	--mhw-on-surface: rgb(184, 191, 120);
+	--mhw-primary: rgb(148, 189, 241);
+	--mhw-on-primary: rgb(190, 217, 242);
+	--mhw-error: rgb(218, 135, 115);
+	--mhw-on-error: rgb(241, 196, 168);
+}

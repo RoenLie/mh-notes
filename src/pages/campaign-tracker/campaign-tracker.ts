@@ -1,3 +1,6 @@
+import { storageHandler } from '@roenlie/mimic-core/dom';
+
+
 export interface CommonBonesOreAndHides {
 	carbaliteOre:      number;
 	malachiteOre:      number;
@@ -30,22 +33,40 @@ export interface CampaignDay {
 	monsterParts: MonsterParts;
 	inventory: Inventory;
 }
+export interface Campaign {
+	campaignId: string;
+	playerName: string;
+	campaignName: string;
+	hunterName: string;
+	palicoName: string;
+	days: CampaignDay[];
+}
 
 
-export class CampaignTracker {
+export class CampaignTracker implements Campaign {
 
 	public days: CampaignDay[];
 	public day: number;
+	public playerName: string;
+	public campaignName: string;
+	public hunterName: string;
+	public palicoName: string;
 
 	constructor(public campaignId: string) {
-		const storedString = localStorage.getItem('campaign-' + campaignId);
-		if (!storedString) {
+		const availableCampaigns = storageHandler.getItem<Campaign[]>('availableCampaigns', []);
+		const campaign = availableCampaigns.find(c => c.campaignId === campaignId);
+		if (!campaign) {
 			console.error('no campaign found with id: ' + campaignId);
 
 			return;
 		}
 
-		const days = JSON.parse(storedString);
+		this.days = campaign.days;
+		this.day = campaign.days.length - 1;
+		this.campaignName = campaign.campaignName;
+		this.playerName = campaign.playerName;
+		this.hunterName = campaign.hunterName;
+		this.palicoName = campaign.palicoName;
 	}
 
 }

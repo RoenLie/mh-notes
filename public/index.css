@@ -1,11 +1,12 @@
+@import url(./css/theme.css);
 body {
 	display: grid;
 	height: 100dvh;
 	padding: 0;
 	margin: 0;
 	box-sizing: border-box;
-	background-color: var(--background, cadetblue);
-	color: var(--on-background, white);
+	background-color: var(--md-background);
+		color: var(--md-on-background);
 }
 
 :root {

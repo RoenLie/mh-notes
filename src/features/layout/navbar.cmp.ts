@@ -16,8 +16,9 @@ export class NavbarCmp extends MimicElement {
 		:host {
 			display: grid;
 			height: 80px;
-			background-color: var(--surface1);
-			border-top: 1px solid var(--shadow1);
+			color: var(--md-on-surface);
+			background-color: var(--md-surface);
+			border-top: 2px solid var(--md-surface-container-highest);
 		}
 		`,
 	];

@@ -29,6 +29,12 @@ export class AppRouterCmp extends MimicElement {
 					),
 				},
 				{
+					path:   '/campaign-create',
+					action: this.routeComponent(
+						() => import('../../pages/campaign-creator/campaign-creator-page.cmp.js'),
+					),
+				},
+				{
 					path:   '/campaign-tracker',
 					action: this.routeComponent(
 						() => import('../../pages/campaign-tracker/campaign-tracker-page.cmp.js'),
