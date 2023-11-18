@@ -16,8 +16,8 @@ MMButton.register();
 
 
 @SignalWatcher
-@customElement('mh-campaign-character')
-export class CampaignCharacter extends MimicElement {
+@customElement('mh-campaign-overview')
+export class CampaignOverview extends MimicElement {
 
 	@property({ type: Object }) public campaignTracker: CampaignTracker;
 
@@ -32,7 +32,7 @@ export class CampaignCharacter extends MimicElement {
 	protected override render() {
 		return html`
 		<h2>
-			Character
+			Campaign
 		</h2>
 
 		${ map(this.formFields, (key) => html`
@@ -79,15 +79,17 @@ export class CampaignCharacter extends MimicElement {
 		sharedStyles,
 		css`
 		:host {
-			--scrollbar-thumb-bg: var(--md-surface-container-highest);
-			--scrollbar-width: 2px;
-
 			display: grid;
 			grid-auto-rows: max-content;
-			padding-inline: 22px;
-			gap: 12px;
 			overflow-x: hidden;
 			overflow-y: scroll;
+
+			padding-block: 32px;
+			padding-inline: 22px;
+			gap: 12px;
+
+			--scrollbar-thumb-bg: var(--md-surface-container-highest);
+			--scrollbar-width: 2px;
 		}
 		h2 {
 			justify-self: center;

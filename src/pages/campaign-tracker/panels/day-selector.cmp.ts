@@ -36,7 +36,7 @@ export class CampaignDaySelector extends MimicElement {
 
 		return html`
 		<h2>
-			Campaign day selector
+			Day selector
 		</h2>
 
 		<ul @click=${ this.handleClickCampaignDay }>
@@ -71,6 +71,9 @@ export class CampaignDaySelector extends MimicElement {
 			overflow-x: hidden;
 			overflow-y: scroll;
 
+			padding-block: 32px;
+			padding-inline: 22px;
+
 			--scrollbar-thumb-bg: var(--md-surface-container-highest);
 			--scrollbar-width: 2px;
 		}
@@ -104,8 +107,9 @@ export class CampaignDaySelector extends MimicElement {
 		mm-button {
 			position: sticky;
 			justify-self: center;
-			bottom: 20px;
+			bottom: -30vh;
 			z-index: 2;
+			padding-top: 24px;
 		}
 		`,
 	];

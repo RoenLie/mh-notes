@@ -11,7 +11,7 @@ import { map } from 'lit/directives/map.js';
 import { html as staticHtml, unsafeStatic } from 'lit/static-html.js';
 
 import { CampaignTracker } from './campaign-tracker.js';
-import { CampaignCharacter } from './panels/character.cmp.js';
+import { CampaignOverview } from './panels/campaign-overview.cmp.js';
 import { CampaignDaySelector } from './panels/day-selector.cmp.js';
 import { CampaignHuntersLog } from './panels/hunters-log.cmp.js';
 import { CampaignInventory } from './panels/inventory.cmp.js';
@@ -19,7 +19,7 @@ import { CampaignInventory } from './panels/inventory.cmp.js';
 MMButton.register();
 MMIcon.register();
 CampaignDaySelector.register();
-CampaignCharacter.register();
+CampaignOverview.register();
 CampaignInventory.register();
 CampaignHuntersLog.register();
 
@@ -42,14 +42,14 @@ export class CampaignTrackerPage extends MimicElement {
 	protected allowFreeScroll = false;
 	protected panels = [
 		{
+			name:    'campaign',
+			tag:     unsafeStatic(CampaignOverview.tagName),
+			iconUrl: 'https://icons.getbootstrap.com/assets/icons/person-wheelchair.svg',
+		},
+		{
 			name:    'day-selector',
 			tag:     unsafeStatic(CampaignDaySelector.tagName),
 			iconUrl: 'https://icons.getbootstrap.com/assets/icons/calendar-week.svg',
-		},
-		{
-			name:    'character',
-			tag:     unsafeStatic(CampaignCharacter.tagName),
-			iconUrl: 'https://icons.getbootstrap.com/assets/icons/person-wheelchair.svg',
 		},
 		{
 			name:    'inventory',
@@ -82,23 +82,22 @@ export class CampaignTrackerPage extends MimicElement {
 
 	public override afterConnectedCallback() {
 		const panel = new URL(location.href).searchParams.get('panel');
-		const page = this.panels.findIndex(p => p.name === panel);
-		if (page > -1) {
-			setTimeout(() => {
-				this.scrollToPage(page, 1);
-				this.handleScrollStop();
-			});
-		}
-		else {
+		const page = this.panels.findIndex(p => p.name === panel) || 0;
+
+		requestAnimationFrame(async () => {
+			await this.scrollToPage(page, 1);
 			this.handleScrollStop();
-		}
+			this.shadowRoot?.querySelectorAll<HTMLElement>('s-scroll-wrapper>*').forEach(el => {
+				el.style.removeProperty('opacity');
+			});
+		});
 	}
 
 	public override disconnectedCallback() {
 		super.disconnectedCallback();
 	}
 
-	protected scrollToPage(page: number, duration?: number) {
+	protected async scrollToPage(page: number, duration?: number) {
 		const scrollEl = this.scrollWrapper;
 		if (!scrollEl)
 			return;
@@ -112,7 +111,7 @@ export class CampaignTrackerPage extends MimicElement {
 		this.scrollStopEnd = Math.min(scrollEl.scrollWidth, (page + 1) * widthPerPage);
 
 		scrollEl.style.setProperty('scroll-snap-type', 'none');
-		scrollElementTo(scrollEl, { duration: duration ?? 500, x: scrollTarget })?.then(() => {
+		await scrollElementTo(scrollEl, { duration: duration ?? 500, x: scrollTarget })?.then(() => {
 			this.allowFreeScroll = false;
 
 			scrollEl.style.removeProperty('scroll-snap-type');
@@ -205,6 +204,7 @@ export class CampaignTrackerPage extends MimicElement {
 		>
 			${ map(this.panels, panel => staticHtml`
 			<${ panel.tag }
+				style="opacity:0;"
 				.campaignTracker=${ this.campaignTracker }
 			></${ panel.tag }>
 			`) }
@@ -248,6 +248,7 @@ export class CampaignTrackerPage extends MimicElement {
 			scroll-snap-align: start;
 			overscroll-behavior-y: contain;
 			overscroll-behavior-x: auto;
+			padding-bottom: 30vh;
 		}
 		`,
 	];

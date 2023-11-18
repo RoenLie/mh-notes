@@ -8,7 +8,7 @@ import { sharedStyles } from '@roenlie/mimic-lit/styles';
 import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
-import { createRef, ref } from 'lit/directives/ref.js';
+import { createRef, type Ref, ref } from 'lit/directives/ref.js';
 import { when } from 'lit/directives/when.js';
 
 import type { CampaignTracker } from '../campaign-tracker.js';
@@ -23,8 +23,16 @@ export class CampaignInventory extends MimicElement {
 
 	@property({ type: Object }) public campaignTracker: CampaignTracker;
 
+	protected refMap = new Map<string, Ref<HTMLElement>>();
+
 	protected get current() {
 		return this.campaignTracker.currentCampaignDay;
+	}
+
+	public override disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this.refMap.clear();
 	}
 
 	protected renderCommonBonesOreAndHides() {
@@ -35,10 +43,11 @@ export class CampaignInventory extends MimicElement {
 		<s-input-wrapper>
 			${ map(Object.keys(this.current.commonBonesOreAndHides), key => html`
 			<mm-input
-				label=${ camelCaseToWords(key) }
-				.value=${ (this.current.commonBonesOreAndHides as any)[key].toString() }
-				@change=${ (ev: EventOf<HTMLInputElement>) =>{
-					(this.current.commonBonesOreAndHides as any)[key] = parseInt(ev.target.value || '0');
+				label  =${ camelCaseToWords(key) }
+				type   ="number"
+				.value =${ (this.current.commonBonesOreAndHides as any)[key].toString() }
+				@change=${ (ev: EventOf<MMInput>) =>{
+					(this.current.commonBonesOreAndHides as any)[key] = ev.target.valueAsNumber;
 					this.requestUpdate();
 				} }
 			></mm-input>
@@ -48,20 +57,24 @@ export class CampaignInventory extends MimicElement {
 	}
 
 	protected renderItem(
-		key: string,
+		id: string,
+		key: {label?: string, value: string},
 		value: string | undefined,
-		onKeyChange: (ev: EventOf<HTMLInputElement>) => void,
-		onValueChange: (ev: EventOf<HTMLInputElement>) => void,
+		onKeyChange: (ev: EventOf<MMInput>) => void,
+		onValueChange: (ev: EventOf<MMInput>) => void,
 		onDelete: () => void,
 	) {
-		const elRef = createRef<HTMLElement>();
+		const elRef = this.refMap.get(id) ??
+			(() => this.refMap.set(id, createRef<HTMLElement>()).get(id)!)();
+
+		const isDisabled = elRef.value?.hasAttribute('disabled') ?? true;
 
 		return html`
 		<s-record>
 			<mm-input
 				${ ref(elRef) }
-				label="Item Name"
-				.value=${ key }
+				label=${ key.label ?? 'Item Name' }
+				.value=${ key.value }
 				disabled
 				@change=${ onKeyChange }
 			>
@@ -70,18 +83,24 @@ export class CampaignInventory extends MimicElement {
 					type="icon"
 					size="x-small"
 					variant="elevated"
-					@click=${ () => elRef.value?.toggleAttribute('disabled') }
+					@click=${ () => {
+						elRef.value?.toggleAttribute('disabled');
+						this.requestUpdate();
+					} }
 				>
-					<mm-icon
-						url="https://icons.getbootstrap.com/assets/icons/lock.svg"
-					></mm-icon>
+					${ when(isDisabled, () => html`
+					<mm-icon url="https://icons.getbootstrap.com/assets/icons/lock.svg"></mm-icon>
+					`, () => html`
+					<mm-icon url="https://icons.getbootstrap.com/assets/icons/unlock.svg"></mm-icon>
+					`) }
 				</mm-button>
 			</mm-input>
 
 			${ when(value !== undefined, () => html`
 			<mm-input
-				label="Amount"
-				.value=${ value }
+				label  ="Amount"
+				type   ="number"
+				.value =${ value! }
 				@change=${ onValueChange }
 			></mm-input>
 			`) }
@@ -106,7 +125,8 @@ export class CampaignInventory extends MimicElement {
 		</h3>
 		${ map(Object.keys(this.current.otherBonesOreAndHides), key => {
 			return this.renderItem(
-				key,
+				'otherBonesOreAndHides-' + key,
+				{ value: key },
 				this.current.otherBonesOreAndHides[key]?.toString() ?? '',
 				ev => {
 					const value = this.current.otherBonesOreAndHides[key] ??= 0;
@@ -145,7 +165,8 @@ export class CampaignInventory extends MimicElement {
 		${ map(Object.keys(this.current.monsterParts), monster => {
 			return html`
 			${ this.renderItem(
-				monster,
+				'monsterParts-' + monster,
+				{ label: 'Monster Name', value: monster },
 				undefined,
 				ev => {
 					const value = this.current.monsterParts[monster] ??= {};
@@ -166,7 +187,8 @@ export class CampaignInventory extends MimicElement {
 			<s-monster-parts>
 			${ map(Object.keys(this.current.monsterParts[monster] ?? {}), itemname => {
 				return this.renderItem(
-					itemname,
+					monster + '-' + itemname,
+					{ value: itemname },
 					this.current.monsterParts[itemname]?.[itemname]?.toString() ?? '',
 					ev => {
 						const monsterRec = this.current.monsterParts[monster] ??= {};
@@ -216,7 +238,8 @@ export class CampaignInventory extends MimicElement {
 		</h3>
 		${ map(Object.keys(this.current.inventory), key => {
 			return this.renderItem(
-				key,
+				'inventory-' + key,
+				{ value: key },
 				this.current.inventory[key]?.toString() ?? '',
 				ev => {
 					const value = this.current.inventory[key] ??= 0;
@@ -249,6 +272,9 @@ export class CampaignInventory extends MimicElement {
 
 	protected override render() {
 		return html`
+		<h2>
+			Inventory
+		</h2>
 		<mm-input
 			label="health potions"
 		></mm-input>
@@ -271,12 +297,17 @@ export class CampaignInventory extends MimicElement {
 			grid-auto-rows: max-content;
 			overflow-x: hidden;
 			overflow-y: scroll;
+
 			padding-block: 32px;
 			padding-inline: 22px;
 			gap: 12px;
 
 			--scrollbar-thumb-bg: var(--md-surface-container-highest);
 			--scrollbar-width: 2px;
+		}
+		h2 {
+			justify-self: center;
+			padding-block: 12px;
 		}
 		h3, mm-button {
 			justify-self: center;
@@ -293,9 +324,12 @@ export class CampaignInventory extends MimicElement {
 		}
 		s-record {
 			display: grid;
-			grid-template-columns: 2fr 1fr max-content;
+			grid-template-columns: 3fr 1fr max-content;
 			align-items: center;
 			gap: 12px;
+		}
+		s-record mm-input:first-of-type:last-of-type {
+			grid-column: span 2;
 		}
 		s-record mm-button {
 			grid-column: 3/4;

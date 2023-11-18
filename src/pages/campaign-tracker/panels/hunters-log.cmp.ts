@@ -15,7 +15,9 @@ export class CampaignHuntersLog extends MimicElement {
 
 	protected override render() {
 		return html`
-		Here goes the hunters log.
+		<h2>
+			Hunters Log
+		</h2>
 
 		<div style="height:300vh;"></div>
 		`;
@@ -25,12 +27,20 @@ export class CampaignHuntersLog extends MimicElement {
 		sharedStyles,
 		css`
 		:host {
-			display: block;
+			display: grid;
+			grid-auto-rows: max-content;
 			overflow-x: hidden;
 			overflow-y: scroll;
 
+			padding-block: 32px;
+			padding-inline: 22px;
+
 			--scrollbar-thumb-bg: var(--md-surface-container-highest);
 			--scrollbar-width: 2px;
+		}
+		h2 {
+			padding-block: 12px;
+			justify-self: center;
 		}
 		`,
 	];

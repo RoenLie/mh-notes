@@ -50,7 +50,6 @@ export class CampaignSelectorPage extends MimicElement {
 		const url = new URL(location.href);
 		url.pathname = '/campaign-tracker';
 		url.searchParams.set('campaign-id', campaign.campaignId);
-		url.searchParams.set('panel', 'day-selector');
 		history.pushState('', '', url);
 		globalThis.dispatchEvent(new PopStateEvent('popstate'));
 	}

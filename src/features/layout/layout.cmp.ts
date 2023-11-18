@@ -24,6 +24,7 @@ export class AppLayoutCmp extends MimicElement {
 			overflow: hidden;
 			display: grid;
 			grid-template-rows: 1fr max-content;
+			overscroll-behavior: contain;
 		}
 		m-navbar {
 			grid-row: 2/3;
