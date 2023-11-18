@@ -5,6 +5,8 @@ import { css, html } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
 
+import { baseUrl, navigate, SearchParams } from '../router/navigate.js';
+
 MMButton.register();
 MMIcon.register();
 
@@ -23,7 +25,7 @@ export class NavbarCmp extends MimicElement {
 		{
 			pathname: '/campaign-tracker',
 			iconUrl:  'https://icons.getbootstrap.com/assets/icons/vignette.svg',
-			visible:  () => new URL(location.href).searchParams.has('campaign-id'),
+			visible:  () => SearchParams.has('campaign-id'),
 		},
 	];
 
@@ -47,14 +49,14 @@ export class NavbarCmp extends MimicElement {
 		${ map(this.nav, nav => when(nav.visible(), () => html`
 		<mm-button
 			type="icon"
-			variant=${ nav.pathname === location.pathname ? 'primary' : 'outline' }
+			variant=${ baseUrl + nav.pathname === location.pathname
+				? 'primary' : 'outline' }
 			shape="rounded"
 			size="large"
 			@click=${ () => {
-				const url = new URL(location.href);
-				url.pathname = nav.pathname;
-				history.pushState('', '', url);
-				window.dispatchEvent(new PopStateEvent('popstate'));
+				navigate({
+					pathname: nav.pathname,
+				});
 			} }
 		>
 			<mm-icon

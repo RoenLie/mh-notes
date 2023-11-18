@@ -6,6 +6,7 @@ import { sharedStyles } from '@roenlie/mimic-lit/styles';
 import { css, html } from 'lit';
 import { map } from 'lit/directives/map.js';
 
+import { navigate } from '../../features/router/navigate.js';
 import type { Campaign } from '../campaign-tracker/campaign-tracker.js';
 
 MMButton.register();
@@ -22,36 +23,31 @@ export class CampaignSelectorPage extends MimicElement {
 	public override connectedCallback() {
 		super.connectedCallback();
 
-		this.availableCampaigns = storageHandler.getItem<Campaign[]>('availableCampaigns', []);
-	}
-
-	public override disconnectedCallback() {
-		super.disconnectedCallback();
+		this.availableCampaigns = storageHandler
+			.getItem<Campaign[]>('availableCampaigns', []);
 	}
 
 	protected handleClickNewCampaign() {
-		const url = new URL(location.href);
-		url.pathname = '/campaign-create';
-		url.search = '';
-		history.pushState('', '', url);
-		globalThis.dispatchEvent(new PopStateEvent('popstate'));
+		navigate({
+			pathname: '/campaign-create',
+			search:   '',
+		});
 	}
 
 	protected handleClickExistingCampaign(ev: Event) {
-		const target = ev.composedPath().find(el => 'campaign' in el) as HTMLElement & {
-			campaign: Campaign;
-		} | undefined;
+		type CampaignElement = HTMLElement & { campaign: Campaign; };
+		const target = ev.composedPath()
+			.find(el => 'campaign' in el) as CampaignElement | undefined;
 
 		if (!target)
 			return;
 
-		const campaign = target.campaign;
-
-		const url = new URL(location.href);
-		url.pathname = '/campaign-tracker';
-		url.searchParams.set('campaign-id', campaign.campaignId);
-		history.pushState('', '', url);
-		globalThis.dispatchEvent(new PopStateEvent('popstate'));
+		navigate({
+			pathname: '/campaign-tracker',
+			search:   {
+				'campaign-id': target.campaign.campaignId,
+			},
+		});
 	}
 
 	protected handle = {

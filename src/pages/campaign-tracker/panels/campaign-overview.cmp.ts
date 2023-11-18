@@ -9,6 +9,7 @@ import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
+import { navigate } from '../../../features/router/navigate.js';
 import type { CampaignTracker } from '../campaign-tracker.js';
 
 MMInput.register();
@@ -60,11 +61,10 @@ export class CampaignOverview extends MimicElement {
 					return;
 
 				this.campaignTracker.deleteCampaign();
-				const url = new URL(location.href);
-				url.pathname = '/campaign-list';
-				url.search = '';
-				history.pushState('', '', url);
-				globalThis.dispatchEvent(new PopStateEvent('popstate'));
+				navigate({
+					pathname: '/campaign-list',
+					search:   '',
+				});
 			} }>
 				Delete
 			</mm-button>

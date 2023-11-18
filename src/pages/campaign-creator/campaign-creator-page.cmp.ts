@@ -6,8 +6,8 @@ import { customElement, MimicElement } from '@roenlie/mimic-lit/element';
 import { sharedStyles } from '@roenlie/mimic-lit/styles';
 import { css, html } from 'lit';
 import { map } from 'lit/directives/map.js';
-import { repeat } from 'lit/directives/repeat.js';
 
+import { navigate } from '../../features/router/navigate.js';
 import { CampaignTracker } from '../campaign-tracker/campaign-tracker.js';
 
 MMInput.register();
@@ -31,11 +31,12 @@ export class CampaignCreatorPage extends MimicElement {
 	protected handleCreateCampaign() {
 		this.campaign.saveCampaign();
 
-		const url = new URL(location.href);
-		url.pathname = '/campaign-tracker';
-		url.searchParams.set('campaign-id', this.campaign.campaignId);
-		history.pushState('', '', url);
-		window.dispatchEvent(new PopStateEvent('popstate'));
+		navigate({
+			pathname: '/campaign-tracker',
+			search:   {
+				'campaign-id': this.campaign.campaignId,
+			},
+		});
 	}
 
 	protected formFields = [

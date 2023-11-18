@@ -10,6 +10,7 @@ import { eventOptions, query, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { html as staticHtml, unsafeStatic } from 'lit/static-html.js';
 
+import { navigate, SearchParams } from '../../features/router/navigate.js';
 import { CampaignTracker } from './campaign-tracker.js';
 import { CampaignOverview } from './panels/campaign-overview.cmp.js';
 import { CampaignDaySelector } from './panels/day-selector.cmp.js';
@@ -35,7 +36,7 @@ export class CampaignTrackerPage extends MimicElement {
 	@query('s-scroll-wrapper') protected scrollWrapper?: HTMLElement;
 
 	protected campaignTracker = new CampaignTracker(
-		new URL(location.href).searchParams.get('campaign-id') ?? '',
+		SearchParams.get('campaign-id'),
 	);
 
 	protected isScrolling = false;
@@ -81,7 +82,7 @@ export class CampaignTrackerPage extends MimicElement {
 	}
 
 	public override afterConnectedCallback() {
-		const panel = new URL(location.href).searchParams.get('panel');
+		const panel = SearchParams.get('panel');
 		const page = this.panels.findIndex(p => p.name === panel) || 0;
 
 		requestAnimationFrame(async () => {
@@ -154,12 +155,8 @@ export class CampaignTrackerPage extends MimicElement {
 		this.isScrolling = false;
 
 		const panel = this.panels[currentPage];
-		if (panel) {
-			const url = new URL(location.href);
-			url.searchParams.set('panel', panel.name);
-			history.pushState('', '', url);
-			globalThis.dispatchEvent(new PopStateEvent('popstate'));
-		}
+		if (panel)
+			navigate({ search: { panel: panel.name } });
 	}, 25);
 
 	protected handleTouchstart(ev: TouchEvent) {
@@ -172,11 +169,7 @@ export class CampaignTrackerPage extends MimicElement {
 		if (!panel)
 			return;
 
-		const url = new URL(location.href);
-		url.searchParams.set('panel', panel.name);
-		history.pushState('', '', url);
-		globalThis.dispatchEvent(new PopStateEvent('popstate'));
-
+		navigate({ search: { panel: panel.name } });
 		this.scrollToPage(index);
 	}
 

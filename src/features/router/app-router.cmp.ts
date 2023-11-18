@@ -2,6 +2,8 @@ import { customElement, MimicElement } from '@roenlie/mimic-lit/element';
 import { type Context, type Route, Router } from '@vaadin/router';
 import { css } from 'lit';
 
+import { baseUrl } from './navigate.js';
+
 
 @customElement('m-app-router')
 export class AppRouterCmp extends MimicElement {
@@ -10,17 +12,17 @@ export class AppRouterCmp extends MimicElement {
 	protected routes: Route[] = [
 		{
 			name:   'root',
-			path:   '/',
+			path:   baseUrl,
 			action: this.routeComponent(
 				() => import('../layout/layout.cmp.js'),
 			),
 			children: [
-				{
-					path:   '/login',
-					action: () => {
-						location.replace(window.location.href + '.html');
-					},
-				},
+				//{
+				//	path:   '/login',
+				//	action: () => {
+				//		location.replace(window.location.href + '.html');
+				//	},
+				//},
 				{ path: '/', redirect: '/campaign-list' },
 				{
 					path:   '/campaign-list',
@@ -44,13 +46,14 @@ export class AppRouterCmp extends MimicElement {
 		},
 		{
 			path:     '(.*)',
-			redirect: '/campaign-list',
+			redirect: baseUrl + '/campaign-list',
 		},
 	];
 
 	public override connectedCallback(): void {
 		super.connectedCallback();
 
+		this.router.baseUrl = '/mh-notes';
 		this.router.setOutlet(this.shadowRoot);
 		this.router.setRoutes(this.routes);
 	}
