@@ -3,9 +3,43 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<title>404</title>
+	<style>
+		/* https://css-pattern.com/ */
+		html {
+			--_root-size: 60px; /* control the size */
+			--_root-bg-c: rgb(12.3% 14% 11.7% / 0.8);
+			--_root-stroke-c: #b09f79;
+
+			--_root-grad: #0000 83%,var(--_root-stroke-c) 85% 99%,#0000 101%;
+			background:
+				radial-gradient(27% 29% at right ,var(--_root-grad)) calc(var(--_root-size)/ 2) var(--_root-size),
+				radial-gradient(27% 29% at left  ,var(--_root-grad)) calc(var(--_root-size)/-2) var(--_root-size),
+				radial-gradient(29% 27% at top   ,var(--_root-grad)) 0 calc(var(--_root-size)/ 2),
+				radial-gradient(29% 27% at bottom,var(--_root-grad)) 0 calc(var(--_root-size)/-2)
+				var(--_root-bg-c) ;
+			background-size: calc(2*var(--_root-size)) calc(2*var(--_root-size));
+		}
+		body {
+			padding: 0;
+			margin: 0;
+			display: grid;
+			place-items: center;
+			height: 100lvh;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			font-size: 32px;
+			color: rgb(251,251,251);
+			white-space: pre;
+			text-align: center;
+			overflow: hidden;
+		}
+	</style>
+	<script type="module">
+		location.pathname = location.pathname.split('/').slice(0,2).join('/');
+	</script>
 </head>
 <body>
-	Here the redirect will happen.
+	Should not see this.
+	Something must be wrong.
 </body>
 </html>
