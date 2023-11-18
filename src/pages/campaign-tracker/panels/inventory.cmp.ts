@@ -7,8 +7,8 @@ import { customElement, MimicElement } from '@roenlie/mimic-lit/element';
 import { sharedStyles } from '@roenlie/mimic-lit/styles';
 import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
-import { map } from 'lit/directives/map.js';
 import { createRef, type Ref, ref } from 'lit/directives/ref.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { when } from 'lit/directives/when.js';
 
 import type { CampaignTracker } from '../campaign-tracker.js';
@@ -41,7 +41,7 @@ export class CampaignInventory extends MimicElement {
 			Common Bones, Ore and Hides.
 		</h3>
 		<s-input-wrapper>
-			${ map(Object.keys(this.current.commonBonesOreAndHides), key => html`
+			${ repeat(Object.keys(this.current.commonBonesOreAndHides), k => k, key => html`
 			<mm-input
 				label  =${ camelCaseToWords(key) }
 				type   ="number"
@@ -123,7 +123,7 @@ export class CampaignInventory extends MimicElement {
 		<h3>
 			Other Bones, Ore and Hides.
 		</h3>
-		${ map(Object.keys(this.current.otherBonesOreAndHides), key => {
+		${ repeat(Object.keys(this.current.otherBonesOreAndHides), k => k, key => {
 			return this.renderItem(
 				'otherBonesOreAndHides-' + key,
 				{ value: key },
@@ -162,7 +162,7 @@ export class CampaignInventory extends MimicElement {
 		<h3>
 			Monster Parts
 		</h3>
-		${ map(Object.keys(this.current.monsterParts), monster => {
+		${ repeat(Object.keys(this.current.monsterParts), k => k, monster => {
 			return html`
 			${ this.renderItem(
 				'monsterParts-' + monster,
@@ -185,7 +185,7 @@ export class CampaignInventory extends MimicElement {
 				},
 			) }
 			<s-monster-parts>
-			${ map(Object.keys(this.current.monsterParts[monster] ?? {}), itemname => {
+			${ repeat(Object.keys(this.current.monsterParts[monster] ?? {}), k => k, itemname => {
 				return this.renderItem(
 					monster + '-' + itemname,
 					{ value: itemname },
@@ -236,7 +236,7 @@ export class CampaignInventory extends MimicElement {
 		<h3>
 			Inventory
 		</h3>
-		${ map(Object.keys(this.current.inventory), key => {
+		${ repeat(Object.keys(this.current.inventory), k => k, key => {
 			return this.renderItem(
 				'inventory-' + key,
 				{ value: key },

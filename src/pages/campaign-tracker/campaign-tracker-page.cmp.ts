@@ -8,6 +8,7 @@ import { sharedStyles } from '@roenlie/mimic-lit/styles';
 import { css, html } from 'lit';
 import { eventOptions, query, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
+import { when } from 'lit/directives/when.js';
 import { html as staticHtml, unsafeStatic } from 'lit/static-html.js';
 
 import { navigate, SearchParams } from '../../features/router/navigate.js';
@@ -35,10 +36,7 @@ export class CampaignTrackerPage extends MimicElement {
 	@state() protected scrollStopEnd = Infinity;
 	@query('s-scroll-wrapper') protected scrollWrapper?: HTMLElement;
 
-	protected campaignTracker = new CampaignTracker(
-		SearchParams.get('campaign-id'),
-	);
-
+	protected campaignTracker = new CampaignTracker(SearchParams.get('campaign-id'));
 	protected isScrolling = false;
 	protected allowFreeScroll = false;
 	protected panels = [
@@ -77,7 +75,7 @@ export class CampaignTrackerPage extends MimicElement {
 
 	public override connectedCallback() {
 		super.connectedCallback();
-
+		this.style.setProperty('opacity', '0');
 		this.campaignTracker.loadCampaign();
 	}
 
@@ -88,9 +86,7 @@ export class CampaignTrackerPage extends MimicElement {
 		requestAnimationFrame(async () => {
 			await this.scrollToPage(page, 1);
 			this.handleScrollStop();
-			this.shadowRoot?.querySelectorAll<HTMLElement>('s-scroll-wrapper>*').forEach(el => {
-				el.style.removeProperty('opacity');
-			});
+			this.style.removeProperty('opacity');
 		});
 	}
 
@@ -112,12 +108,11 @@ export class CampaignTrackerPage extends MimicElement {
 		this.scrollStopEnd = Math.min(scrollEl.scrollWidth, (page + 1) * widthPerPage);
 
 		scrollEl.style.setProperty('scroll-snap-type', 'none');
-		await scrollElementTo(scrollEl, { duration: duration ?? 500, x: scrollTarget })?.then(() => {
-			this.allowFreeScroll = false;
+		await scrollElementTo(scrollEl, { duration: duration ?? 500, x: scrollTarget });
+		this.allowFreeScroll = false;
 
-			scrollEl.style.removeProperty('scroll-snap-type');
-			this.requestUpdate();
-		});
+		scrollEl.style.removeProperty('scroll-snap-type');
+		this.requestUpdate();
 	}
 
 	@eventOptions({ passive: true })
@@ -177,6 +172,12 @@ export class CampaignTrackerPage extends MimicElement {
 		return html`
 		<s-subnav>
 			${ map(this.panels, (nav, i) => html`
+			${ when(Math.ceil(this.panels.length / 2) === i, () => html`
+			<s-day-indicator>
+				Day: ${ this.campaignTracker.day }
+			</s-day-indicator>
+			`) }
+
 			<mm-button
 				type="icon"
 				shape="rounded"
@@ -197,7 +198,6 @@ export class CampaignTrackerPage extends MimicElement {
 		>
 			${ map(this.panels, panel => staticHtml`
 			<${ panel.tag }
-				style="opacity:0;"
 				.campaignTracker=${ this.campaignTracker }
 			></${ panel.tag }>
 			`) }
