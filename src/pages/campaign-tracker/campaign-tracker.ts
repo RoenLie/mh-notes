@@ -38,6 +38,7 @@ export interface Campaign {
 	palicoName: string;
 	campaignLength: number;
 	days: CampaignDay[];
+	lastUpdated: string;
 }
 
 
@@ -48,6 +49,7 @@ export class CampaignTracker {
 	public hunterName = '';
 	public palicoName = '';
 	public campaignLength = 20;
+	public lastUpdated = new Date().toISOString();
 	public day: Signal<number> = signal(1);
 	public days: CampaignDay[] = [
 		{
@@ -58,19 +60,19 @@ export class CampaignTracker {
 			monsterParts:           {},
 			otherBonesOreAndHides:  {},
 			commonBonesOreAndHides: {
+				carbaliteOre:      0,
+				malachiteOre:      0,
+				dragoniteOre:      0,
+				fuciumOre:         0,
+				qualityBone:       0,
+				monsterBoneSmall:  0,
+				monsterBoneMedium: 0,
+				monsterBoneLarge:  0,
+				monsterKeenbone:   0,
+				monsterHardbone:   0,
 				ancientBone:       0,
 				boulderBone:       0,
-				carbaliteOre:      0,
-				dragoniteOre:      0,
 				dragonveinCrystal: 0,
-				fuciumOre:         0,
-				malachiteOre:      0,
-				monsterBoneLarge:  0,
-				monsterBoneMedium: 0,
-				monsterBoneSmall:  0,
-				monsterHardbone:   0,
-				monsterKeenbone:   0,
-				qualityBone:       0,
 				wingdrakeHide:     0,
 			},
 		},
@@ -86,7 +88,7 @@ export class CampaignTracker {
 
 	constructor(public campaignId: string) { }
 
-	public saveCampaign() {
+	public saveCampaign(day?: number) {
 		const data: Campaign = {
 			campaignId:     this.campaignId,
 			campaignLength: this.campaignLength,
@@ -95,6 +97,7 @@ export class CampaignTracker {
 			palicoName:     this.palicoName,
 			playerName:     this.playerName,
 			days:           this.days,
+			lastUpdated:    new Date().toISOString(),
 		};
 
 		const available = storageHandler.getItem<Campaign[]>('availableCampaigns', []);
@@ -110,21 +113,32 @@ export class CampaignTracker {
 		}
 
 		storageHandler.setItem('availableCampaigns', available);
+		this.loadCampaign(day);
 	}
 
-	public loadCampaign() {
+	public loadCampaign(day?: number) {
 		const availableCampaigns = storageHandler.getItem<Campaign[]>('availableCampaigns', []);
 		const campaign = availableCampaigns.find(c => c.campaignId === this.campaignId);
 		if (!campaign)
 			return console.error('no campaign found with id: ' + this.campaignId);
 
 		this.days           = campaign.days;
-		this.day.value      = campaign.days.length;
+		this.day.value      = day ?? campaign.days.length;
 		this.playerName     = campaign.playerName;
 		this.hunterName     = campaign.hunterName;
 		this.palicoName     = campaign.palicoName;
 		this.campaignName   = campaign.campaignName;
 		this.campaignLength = campaign.campaignLength;
+		this.lastUpdated    = campaign.lastUpdated;
+	}
+
+	public deleteCampaign() {
+		const availableCampaigns = storageHandler.getItem<Campaign[]>('availableCampaigns', []);
+		const campaignIndex = availableCampaigns.findIndex(c => c.campaignId === this.campaignId);
+		if (campaignIndex > -1)
+			availableCampaigns.splice(campaignIndex, 1);
+
+		storageHandler.setItem('availableCampaigns', availableCampaigns);
 	}
 
 	public isValidCampaign() {

@@ -39,15 +39,39 @@ export class CampaignCharacter extends MimicElement {
 		<mm-input
 			label=${ camelCaseToWords(key) }
 			.value=${ this.campaignTracker[key] as any }
-			@change=${ (ev: EventOf<MMInput>) => (this.campaignTracker as any)[key] = ev.target.value }
+			@change=${ (ev: EventOf<MMInput>) => {
+				(this.campaignTracker as any)[key] = ev.target.value || '';
+				this.requestUpdate();
+			} }
 		></mm-input>
 		`) }
 
-		<mm-button
-			@click=${ () => this.campaignTracker.saveCampaign() }
-		>
-			Save
-		</mm-button>
+		<s-action-wrapper>
+			<mm-button @click=${ () => {
+				this.campaignTracker.saveCampaign(this.campaignTracker.day.value);
+				this.requestUpdate();
+			} }>
+				Save
+			</mm-button>
+
+			<mm-button variant="error" @click=${ () => {
+				const remove = confirm('Delete campaign?');
+				if (!remove)
+					return;
+
+				this.campaignTracker.deleteCampaign();
+				const url = new URL(location.href);
+				url.pathname = '/campaign-list';
+				url.search = '';
+				history.pushState('', '', url);
+				globalThis.dispatchEvent(new PopStateEvent('popstate'));
+			} }>
+				Delete
+			</mm-button>
+		</s-action-wrapper>
+		<h5>
+			Last Saved: ${ new Date(this.campaignTracker.lastUpdated).toUTCString() }
+		</h5>
 		`;
 	}
 
@@ -69,9 +93,16 @@ export class CampaignCharacter extends MimicElement {
 			justify-self: center;
 			padding-block: 12px;
 		}
+		h5 {
+			justify-self: center;
+		}
 		mm-button {
 			justify-self: center;
 			padding-block: 12px;
+		}
+		s-action-wrapper {
+			display: grid;
+			grid-auto-flow: column;
 		}
 		`,
 	];
