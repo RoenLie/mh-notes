@@ -14,6 +14,7 @@ export default defineConfig({
 		rollupOptions: {
 			input: [
 				'./src/index.html',
+				'./src/404.html',
 				'./src/login.html',
 			],
 		},
