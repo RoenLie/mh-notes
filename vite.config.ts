@@ -1,11 +1,10 @@
-import { readFileSync } from 'fs';
-import { defineConfig, type Plugin } from 'vite';
-
+import { viteCopy } from '@roenlie/package-toolbox/vite-utils';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
 	root:      './src',
 	publicDir: '../public',
-	appType:   'mpa',
+	appType:   'spa',
 	build:     {
 		outDir:        '../dist',
 		rollupOptions: {
@@ -15,5 +14,17 @@ export default defineConfig({
 			],
 		},
 	},
-	plugins: [ ],
+	plugins: [
+		//
+		viteCopy({
+			targets: [
+				{
+					from: './node_modules/@roenlie/mimic-elements/styles',
+					to:   './public/vendor/mimic-elements',
+				},
+			],
+			hook:     'config',
+			copyOnce: true,
+		}),
+	],
 });

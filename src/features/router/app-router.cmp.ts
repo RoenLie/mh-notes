@@ -42,6 +42,10 @@ export class AppRouterCmp extends MimicElement {
 				},
 			],
 		},
+		{
+			path:     '(.*)',
+			redirect: '/campaign-list',
+		},
 	];
 
 	public override connectedCallback(): void {

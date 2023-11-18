@@ -1,5 +1,8 @@
 import { SignalWatcher } from '@lit-labs/preact-signals';
+import { scrollElementTo } from '@roenlie/mimic-core/dom';
 import { debounce } from '@roenlie/mimic-core/timing';
+import { MMButton } from '@roenlie/mimic-elements/button';
+import { MMIcon } from '@roenlie/mimic-elements/icon';
 import { customElement, MimicElement } from '@roenlie/mimic-lit/element';
 import { sharedStyles } from '@roenlie/mimic-lit/styles';
 import { css, html } from 'lit';
@@ -8,13 +11,17 @@ import { map } from 'lit/directives/map.js';
 import { html as staticHtml, unsafeStatic } from 'lit/static-html.js';
 
 import { CampaignTracker } from './campaign-tracker.js';
-import { CampaignCharacter } from './character.cmp.js';
-import { CampaignDaySelector } from './day-selector.cmp.js';
-import { CampaignInventory } from './inventory.cmp.js';
+import { CampaignCharacter } from './panels/character.cmp.js';
+import { CampaignDaySelector } from './panels/day-selector.cmp.js';
+import { CampaignHuntersLog } from './panels/hunters-log.cmp.js';
+import { CampaignInventory } from './panels/inventory.cmp.js';
 
+MMButton.register();
+MMIcon.register();
 CampaignDaySelector.register();
 CampaignCharacter.register();
 CampaignInventory.register();
+CampaignHuntersLog.register();
 
 
 @SignalWatcher
@@ -25,33 +32,99 @@ export class CampaignTrackerPage extends MimicElement {
 
 	@state() protected scrollStopStart = 0;
 	@state() protected scrollStopEnd = Infinity;
-	@query('s-scroll-wrapper') protected scrollWrapper: HTMLElement;
+	@query('s-scroll-wrapper') protected scrollWrapper?: HTMLElement;
 
 	protected campaignTracker = new CampaignTracker(
-		new URL(location.href).searchParams.get('campaign') ?? '',
+		new URL(location.href).searchParams.get('campaign-id') ?? '',
 	);
 
 	protected isScrolling = false;
-	protected panelTags = [
-		unsafeStatic(CampaignDaySelector.tagName),
-		unsafeStatic(CampaignCharacter.tagName),
-		unsafeStatic(CampaignInventory.tagName),
+	protected allowFreeScroll = false;
+	protected panels = [
+		{
+			name:    'day-selector',
+			tag:     unsafeStatic(CampaignDaySelector.tagName),
+			iconUrl: 'https://icons.getbootstrap.com/assets/icons/calendar-week.svg',
+		},
+		{
+			name:    'character',
+			tag:     unsafeStatic(CampaignCharacter.tagName),
+			iconUrl: 'https://icons.getbootstrap.com/assets/icons/person-wheelchair.svg',
+		},
+		{
+			name:    'inventory',
+			tag:     unsafeStatic(CampaignInventory.tagName),
+			iconUrl: 'https://icons.getbootstrap.com/assets/icons/safe2.svg',
+		},
+		{
+			name:    'hunters-log',
+			tag:     unsafeStatic(CampaignHuntersLog.tagName),
+			iconUrl: 'https://icons.getbootstrap.com/assets/icons/journal-text.svg',
+		},
 	];
+
+	protected get activePanel() {
+		const scrollEl = this.scrollWrapper;
+		if (!scrollEl)
+			return 0;
+
+		const widthPerPage = scrollEl.offsetWidth;
+		const currentPage = Math.round(scrollEl.scrollLeft / widthPerPage);
+
+		return currentPage;
+	}
 
 	public override connectedCallback() {
 		super.connectedCallback();
+
+		this.campaignTracker.loadCampaign();
 	}
 
 	public override afterConnectedCallback() {
-		requestAnimationFrame(() => this.scrollStopEnd = this.scrollWrapper.offsetWidth);
+		const panel = new URL(location.href).searchParams.get('panel');
+		const page = this.panels.findIndex(p => p.name === panel);
+		if (page > -1) {
+			setTimeout(() => {
+				this.scrollToPage(page, 1);
+				this.handleScrollStop();
+			});
+		}
+		else {
+			this.handleScrollStop();
+		}
 	}
 
 	public override disconnectedCallback() {
 		super.disconnectedCallback();
 	}
 
+	protected scrollToPage(page: number, duration?: number) {
+		const scrollEl = this.scrollWrapper;
+		if (!scrollEl)
+			return;
+
+		const widthPerPage = scrollEl.offsetWidth;
+		const scrollTarget = widthPerPage * page;
+
+		this.allowFreeScroll = true;
+
+		this.scrollStopStart = Math.max(0, (page - 1) * widthPerPage);
+		this.scrollStopEnd = Math.min(scrollEl.scrollWidth, (page + 1) * widthPerPage);
+
+		scrollEl.style.setProperty('scroll-snap-type', 'none');
+		scrollElementTo(scrollEl, { duration: duration ?? 500, x: scrollTarget })?.then(() => {
+			this.allowFreeScroll = false;
+
+			scrollEl.style.removeProperty('scroll-snap-type');
+			this.requestUpdate();
+		});
+	}
+
 	@eventOptions({ passive: true })
 	protected handleScroll(ev: Event & {target: HTMLElement}) {
+		if (this.allowFreeScroll)
+			return;
+
 		this.isScrolling = true;
 
 		const target = ev.target;
@@ -69,14 +142,25 @@ export class CampaignTrackerPage extends MimicElement {
 
 	protected handleScrollStop = debounce(() => {
 		const scrollEl = this.scrollWrapper;
+		if (!scrollEl)
+			return;
+
 		const widthPerPage = scrollEl.offsetWidth;
 		const currentPage = Math.round(scrollEl.scrollLeft / widthPerPage);
 
 		this.scrollStopStart = Math.max(0, (currentPage - 1) * widthPerPage);
 		this.scrollStopEnd = Math.min(scrollEl.scrollWidth, (currentPage + 1) * widthPerPage);
 
-		this.scrollWrapper.style.removeProperty('overflow');
+		scrollEl.style.removeProperty('overflow');
 		this.isScrolling = false;
+
+		const panel = this.panels[currentPage];
+		if (panel) {
+			const url = new URL(location.href);
+			url.searchParams.set('panel', panel.name);
+			history.pushState('', '', url);
+			globalThis.dispatchEvent(new PopStateEvent('popstate'));
+		}
 	}, 25);
 
 	protected handleTouchstart(ev: TouchEvent) {
@@ -84,14 +168,45 @@ export class CampaignTrackerPage extends MimicElement {
 			ev.preventDefault();
 	}
 
+	protected handleSubnavClick(index: number) {
+		const panel = this.panels[index];
+		if (!panel)
+			return;
+
+		const url = new URL(location.href);
+		url.searchParams.set('panel', panel.name);
+		history.pushState('', '', url);
+		globalThis.dispatchEvent(new PopStateEvent('popstate'));
+
+		this.scrollToPage(index);
+	}
+
 	protected override render() {
 		return html`
+		<s-subnav>
+			${ map(this.panels, (nav, i) => html`
+			<mm-button
+				type="icon"
+				shape="rounded"
+				size="small"
+				variant=${ this.activePanel === i ? 'primary' : 'outline' }
+				@click=${ () => this.handleSubnavClick(i) }
+			>
+				<mm-icon
+					url=${ nav.iconUrl }
+				></mm-icon>
+			</mm-button>
+			`) }
+		</s-subnav>
+
 		<s-scroll-wrapper
 			@scroll=${ this.handleScroll }
 			@touchstart=${ this.handleTouchstart }
 		>
-			${ map(this.panelTags, panel => staticHtml`
-			<${ panel }></${ panel }>
+			${ map(this.panels, panel => staticHtml`
+			<${ panel.tag }
+				.campaignTracker=${ this.campaignTracker }
+			></${ panel.tag }>
 			`) }
 		</s-scroll-wrapper>
 		`;
@@ -103,6 +218,20 @@ export class CampaignTrackerPage extends MimicElement {
 		:host {
 			overflow: hidden;
 			display: grid;
+			grid-template-rows: max-content 1fr;
+		}
+		s-subnav {
+			display: grid;
+			height: 50px;
+			color: var(--md-on-surface);
+			background-color: var(--md-surface);
+			border-bottom: 2px solid var(--md-surface-container-highest);
+
+			grid-auto-flow: column;
+			grid-auto-columns: 1fr;
+			place-items: center;
+			padding-inline: 24px;
+			gap: 24px;
 		}
 		s-scroll-wrapper {
 			overflow-y: hidden;

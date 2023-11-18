@@ -46,17 +46,4 @@
 		"titleBar.inactiveForeground": "#e7e7e799"
 	},
 	"peacock.color": "rgb(30,30,30)",
-	"restoreTerminals.runOnStartup": true,
-	"restoreTerminals.terminals": [
-		{
-			"splitTerminals": [
-				{
-					"name": "client",
-					"commands": [
-						"cd client"
-					]
-				}
-			]
-		}
-	],
 }
