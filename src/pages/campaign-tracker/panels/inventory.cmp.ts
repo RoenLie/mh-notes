@@ -135,7 +135,7 @@ export class CampaignInventory extends MimicElement {
 					this.requestUpdate();
 				},
 				ev => {
-					this.current.otherBonesOreAndHides[key] = parseInt(ev.target.value || '0');
+					this.current.otherBonesOreAndHides[key] = Number(ev.target.value);
 					this.requestUpdate();
 				},
 				() => {
@@ -189,7 +189,7 @@ export class CampaignInventory extends MimicElement {
 				return this.renderItem(
 					monster + '-' + itemname,
 					{ value: itemname },
-					this.current.monsterParts[itemname]?.[itemname]?.toString() ?? '',
+					this.current.monsterParts[monster]?.[itemname]?.toString() ?? '',
 					ev => {
 						const monsterRec = this.current.monsterParts[monster] ??= {};
 						const value = monsterRec[itemname] ?? 0;
@@ -199,7 +199,7 @@ export class CampaignInventory extends MimicElement {
 						this.requestUpdate();
 					},
 					ev => {
-						(this.current.monsterParts[monster] ??= {})[itemname] = parseInt(ev.target.value || '0');
+						(this.current.monsterParts[monster] ??= {})[itemname] = Number(ev.target.value);
 						this.requestUpdate();
 					},
 					() => {
@@ -300,7 +300,7 @@ export class CampaignInventory extends MimicElement {
 
 			padding-block: 32px;
 			padding-inline: 22px;
-			gap: 12px;
+			gap: 8px;
 
 			--scrollbar-thumb-bg: var(--md-surface-container-highest);
 			--scrollbar-width: 2px;
@@ -324,7 +324,7 @@ export class CampaignInventory extends MimicElement {
 		}
 		s-record {
 			display: grid;
-			grid-template-columns: 3fr 1fr max-content;
+			grid-template-columns: 1fr 60px max-content;
 			align-items: center;
 			gap: 12px;
 		}

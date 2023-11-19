@@ -224,7 +224,6 @@ export class CampaignTrackerPage extends MimicElement {
 			grid-auto-columns: 1fr;
 			place-items: center;
 			padding-inline: 24px;
-			gap: 24px;
 		}
 		s-scroll-wrapper {
 			overflow-y: hidden;
@@ -242,6 +241,9 @@ export class CampaignTrackerPage extends MimicElement {
 			overscroll-behavior-y: contain;
 			overscroll-behavior-x: auto;
 			padding-bottom: 30vh;
+		}
+		s-day-indicator {
+			white-space: nowrap;
 		}
 		`,
 	];
