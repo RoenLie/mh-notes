@@ -18,13 +18,12 @@ export interface CommonBonesOreAndHides {
 	dragonveinCrystal: number;
 	wingdrakeHide:     number;
 }
-export interface OtherBonesOreAndHides extends Record<string, number> {}
-export interface MonsterParts extends Record<string, Record<string, number>> {}
-export interface Inventory extends Record<string, number> {}
 
-//export type OtherBonesOreAndHides = {key: string, value: number}[];
-//export type MonsterParts = {key: string, value: {key: string, value: number}}[];
-//export type Inventory = {key: string, value: number}[];
+export interface Monster {key: string; value: Item[];}
+export interface Item {key: string; value: number;}
+export type OtherBonesOreAndHides = Item[];
+export type MonsterParts = {key: string; value: Item[];}[];
+export type Inventory = Item[];
 
 export interface CampaignDay {
 	campaignId: string;
@@ -61,9 +60,9 @@ export class CampaignTracker {
 			campaignId:             this.campaignId,
 			day:                    this.day.value,
 			healthPotions:          0,
-			inventory:              {},
-			monsterParts:           {},
-			otherBonesOreAndHides:  {},
+			inventory:              [],
+			monsterParts:           [],
+			otherBonesOreAndHides:  [],
 			commonBonesOreAndHides: {
 				carbaliteOre:      0,
 				malachiteOre:      0,

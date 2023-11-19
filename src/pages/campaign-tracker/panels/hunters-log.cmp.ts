@@ -1,23 +1,51 @@
 import { SignalWatcher } from '@lit-labs/preact-signals';
 import { camelCaseToWords } from '@roenlie/mimic-core/string';
+import { type Change, getObjectDiff, readPath } from '@roenlie/mimic-core/structs';
 import { customElement, MimicElement } from '@roenlie/mimic-lit/element';
 import { sharedStyles } from '@roenlie/mimic-lit/styles';
 import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
-import type { CampaignTracker } from '../campaign-tracker.js';
+import type { CampaignTracker, Item, Monster } from '../campaign-tracker.js';
 
 
 @SignalWatcher
 @customElement('mh-campaign-hunters-log')
 export class CampaignHuntersLog extends MimicElement {
 
-	protected static createKeyFromChange(change: Change) {
-		return camelCaseToWords(change.path.split('.').slice(1).join(' '));
-	}
-
 	@property({ type: Object }) public campaignTracker: CampaignTracker;
+
+	protected createKeyFromChange(change: Change) {
+		let label = change.path.split('.').slice(1).join(' ');
+
+		// only monsterparts are nested, so we check for a length of 2 to confirm.
+		if (change.path.split('.value.').length === 2) {
+			const parts = change.path.split('.value.');
+
+			const monster = readPath(
+				this.campaignTracker.currentCampaignDay as any,
+				parts[0]!,
+			) as Monster;
+
+			const item = readPath(
+				this.campaignTracker.currentCampaignDay as any,
+				change.path.split('.').slice(0, -1).join('.'),
+			) as Item;
+
+			label = monster.key + ' ' + item.key;
+		}
+		else if (change.path.endsWith('value')) {
+			const item = readPath(
+				this.campaignTracker.currentCampaignDay as any,
+				change.path.split('.').slice(0, -1).join('.'),
+			) as Item;
+
+			label = item.key;
+		}
+
+		return camelCaseToWords(label);
+	}
 
 	protected renderChanges(label: string, changes: Change[]) {
 		return html`
@@ -28,7 +56,7 @@ export class CampaignHuntersLog extends MimicElement {
 			${ map(changes, change => html`
 			<s-change>
 				<s-text>
-					${ CampaignHuntersLog.createKeyFromChange(change) }
+					${ this.createKeyFromChange(change) }
 				</s-text>
 				<s-text>
 					from ${ change.oldValue ?? 0 }
@@ -46,8 +74,12 @@ export class CampaignHuntersLog extends MimicElement {
 		const campaign = this.campaignTracker;
 		const days = structuredClone(campaign.days.slice(0, campaign.day.value));
 
-		const diffs = days.map((current, index) => index === 0 ? [] : getChangedKeys(days[index - 1]!, current))
-			.map(arr => arr.filter(change => change && change.path !== 'day' && change.path !== 'campaignId'));
+		const diffs = days.map((current, index) => index === 0 ? [] : getObjectDiff(days[index - 1]!, current))
+			.map(arr => arr
+				// Not interested in changes to id or which day it is.
+				.filter(change => change?.path !== 'day' && change?.path !== 'campaignId')
+				// Anything ending in key is a name change.
+				.filter(change => !change.path.endsWith('key')));
 
 		return html`
 		<h2>
@@ -160,60 +192,3 @@ export class CampaignHuntersLog extends MimicElement {
 	];
 
 }
-
-
-interface Change { path: string; oldValue?: any; newValue?: any; }
-
-const traces = new WeakSet();
-
-const getChangedKeys = (obj1: Record<keyof any, any>, obj2?: Record<keyof any, any>, parentKey = ''): Change[] => {
-	const changedKeys: Change[] = [];
-
-	if (traces.has(obj1) || (obj2 && traces.has(obj2))) {
-		return changedKeys;
-	}
-	else {
-		traces.add(obj1);
-		obj2 && traces.add(obj2);
-	}
-
-	// Check keys in obj1
-	for (const key in obj1) {
-		const currentKey = parentKey ? `${ parentKey }.${ key }` : key;
-
-		if (typeof obj1[key] === 'object' && typeof obj2?.[key] === 'object') {
-			const nestedChanges = getChangedKeys(obj1[key], obj2[key], currentKey);
-			changedKeys.push(...nestedChanges);
-		}
-		else if (obj1[key] !== obj2?.[key]) {
-			if (typeof obj1[key] === 'object') {
-				const nestedChanges = getChangedKeys(obj1[key], {}, currentKey);
-				changedKeys.push(...nestedChanges);
-			}
-			else if (typeof obj2?.[key] === 'object') {
-				const nestedChanges = getChangedKeys(obj2[key], {}, currentKey);
-				changedKeys.push(...nestedChanges);
-			}
-			else {
-				changedKeys.push({ path: currentKey, oldValue: obj1[key], newValue: obj2?.[key] });
-			}
-		}
-	}
-
-	// Check keys in obj2 that are not in obj1
-	for (const key in obj2) {
-		const currentKey = parentKey ? `${ parentKey }.${ key }` : key;
-
-		if (!obj1.hasOwnProperty(key)) {
-			if (typeof obj2[key] === 'object') {
-				const nestedChanges = getChangedKeys({}, obj2[key], currentKey);
-				changedKeys.push(...nestedChanges);
-			}
-			else {
-				changedKeys.push({ path: currentKey, oldValue: undefined, newValue: obj2[key] });
-			}
-		}
-	}
-
-	return changedKeys;
-};

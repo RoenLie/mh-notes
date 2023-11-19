@@ -7,6 +7,7 @@ import { customElement, MimicElement } from '@roenlie/mimic-lit/element';
 import { sharedStyles } from '@roenlie/mimic-lit/styles';
 import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
+import { map } from 'lit/directives/map.js';
 import { createRef, type Ref, ref } from 'lit/directives/ref.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { when } from 'lit/directives/when.js';
@@ -123,19 +124,17 @@ export class CampaignInventory extends MimicElement {
 		<h3>
 			Other Bones, Ore and Hides.
 		</h3>
-		${ repeat(Object.keys(this.current.otherBonesOreAndHides), k => k, key => {
+		${ map(this.current.otherBonesOreAndHides, (item, i) => {
 			return this.renderItem(
-				'otherBonesOreAndHides-' + key,
-				{ value: key },
-				this.current.otherBonesOreAndHides[key]?.toString() ?? '',
+				'otherBonesOreAndHides-' + i,
+				{ value: item.key },
+				item.value?.toString() ?? '',
 				ev => {
-					const value = this.current.otherBonesOreAndHides[key] ??= 0;
-					delete this.current.otherBonesOreAndHides[key];
-					this.current.otherBonesOreAndHides[ev.target.value] = value;
+					item.key = ev.target.value;
 					this.requestUpdate();
 				},
 				ev => {
-					this.current.otherBonesOreAndHides[key] = Number(ev.target.value);
+					item.value = Number(ev.target.value);
 					this.requestUpdate();
 				},
 				() => {
@@ -143,13 +142,13 @@ export class CampaignInventory extends MimicElement {
 					if (!remove)
 						return;
 
-					delete this.current.otherBonesOreAndHides[key];
+					this.current.otherBonesOreAndHides.splice(i, 1);
 					this.requestUpdate();
 				},
 			);
 		}) }
 		<mm-button class="add-button" size="small" @click=${ () => {
-			this.current.otherBonesOreAndHides[''] = 0;
+			this.current.otherBonesOreAndHides.push({ key: '', value: 0 });
 			this.requestUpdate();
 		} }>
 			Add Item
@@ -162,16 +161,15 @@ export class CampaignInventory extends MimicElement {
 		<h3>
 			Monster Parts
 		</h3>
-		${ repeat(Object.keys(this.current.monsterParts), k => k, monster => {
+		${ map(this.current.monsterParts, (monster, mIndex) => {
 			return html`
 			${ this.renderItem(
-				'monsterParts-' + monster,
-				{ label: 'Monster Name', value: monster },
+				'monsterParts-' + mIndex,
+				{ label: 'Monster Name', value: monster.key },
 				undefined,
 				ev => {
-					const value = this.current.monsterParts[monster] ??= {};
-					delete this.current.monsterParts[monster];
-					this.current.monsterParts[ev.target.value] = value;
+					monster.key = ev.target.value;
+					monster.value ??= [];
 					this.requestUpdate();
 				},
 				() => {},
@@ -180,26 +178,22 @@ export class CampaignInventory extends MimicElement {
 					if (!remove)
 						return;
 
-					delete this.current.monsterParts[monster];
+					this.current.monsterParts.splice(mIndex, 1);
 					this.requestUpdate();
 				},
 			) }
 			<s-monster-parts>
-			${ repeat(Object.keys(this.current.monsterParts[monster] ?? {}), k => k, itemname => {
+			${ map(monster.value ?? [], (item, iItem) => {
 				return this.renderItem(
-					monster + '-' + itemname,
-					{ value: itemname },
-					this.current.monsterParts[monster]?.[itemname]?.toString() ?? '',
+					monster + '-' + iItem,
+					{ value: item.key },
+					item.value.toString() ?? '',
 					ev => {
-						const monsterRec = this.current.monsterParts[monster] ??= {};
-						const value = monsterRec[itemname] ?? 0;
-
-						delete monsterRec[itemname];
-						monsterRec[ev.target.value] = value;
+						item.key = ev.target.value;
 						this.requestUpdate();
 					},
 					ev => {
-						(this.current.monsterParts[monster] ??= {})[itemname] = Number(ev.target.value);
+						item.value = Number(ev.target.value);
 						this.requestUpdate();
 					},
 					() => {
@@ -207,7 +201,7 @@ export class CampaignInventory extends MimicElement {
 						if (!remove)
 							return;
 
-						delete this.current.monsterParts[monster]?.[itemname];
+						monster.value?.splice(iItem, 1);
 						this.requestUpdate();
 					},
 				);
@@ -215,7 +209,7 @@ export class CampaignInventory extends MimicElement {
 			</s-monster-parts>
 
 			<mm-button class="add-button" size="small" @click=${ () => {
-				(this.current.monsterParts[monster] ??= {})[''] = 0;
+				monster.value?.push({ key: '', value: 0 });
 				this.requestUpdate();
 			} }>
 				Add Item
@@ -223,7 +217,7 @@ export class CampaignInventory extends MimicElement {
 			`;
 		}) }
 		<mm-button class="add-button" size="small" @click=${ () => {
-			this.current.monsterParts[''] ??= {};
+			this.current.monsterParts.push({ key: '', value: [] });
 			this.requestUpdate();
 		} }>
 			Add Monster
@@ -236,19 +230,17 @@ export class CampaignInventory extends MimicElement {
 		<h3>
 			Inventory
 		</h3>
-		${ repeat(Object.keys(this.current.inventory), k => k, key => {
+		${ map(this.current.inventory, (item, i) => {
 			return this.renderItem(
-				'inventory-' + key,
-				{ value: key },
-				this.current.inventory[key]?.toString() ?? '',
+				'inventory-' + i,
+				{ value: item.key },
+				item.value.toString() ?? '',
 				ev => {
-					const value = this.current.inventory[key] ??= 0;
-					delete this.current.inventory[key];
-					this.current.inventory[ev.target.value] = value;
+					item.key = ev.target.value;
 					this.requestUpdate();
 				},
 				ev => {
-					this.current.inventory[key] = parseInt(ev.target.value);
+					item.value = Number(ev.target.value);
 					this.requestUpdate();
 				},
 				() => {
@@ -256,13 +248,13 @@ export class CampaignInventory extends MimicElement {
 					if (!remove)
 						return;
 
-					delete this.current.inventory[key];
+					this.current.inventory.splice(i, 1);
 					this.requestUpdate();
 				},
 			);
 		}) }
 		<mm-button class="add-button" size="small" @click=${ () => {
-			this.current.inventory[''] ??= 0;
+			this.current.inventory.push({ key: '', value: 0 });
 			this.requestUpdate();
 		} }>
 			Add Item

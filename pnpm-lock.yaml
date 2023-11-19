@@ -15,20 +15,20 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1
   '@roenlie/lit-context':
-    specifier: ^1.0.17
-    version: 1.0.17(lit@3.1.0)
+    specifier: ^1.0.18
+    version: 1.0.18(lit@3.1.0)
   '@roenlie/lit-state-store':
-    specifier: ^0.0.26
-    version: 0.0.26(lit@3.1.0)
+    specifier: ^0.0.27
+    version: 0.0.27(lit@3.1.0)
   '@roenlie/mimic-core':
-    specifier: ^0.0.58
-    version: 0.0.58
+    specifier: ^0.0.59
+    version: 0.0.59
   '@roenlie/mimic-elements':
-    specifier: ^0.0.53
-    version: 0.0.53(lit@3.1.0)
+    specifier: ^0.0.54
+    version: 0.0.54(lit@3.1.0)
   '@roenlie/mimic-lit':
-    specifier: ^0.0.68
-    version: 0.0.68(lit@3.1.0)
+    specifier: ^0.0.69
+    version: 0.0.69(lit@3.1.0)
   '@vaadin/router':
     specifier: ^1.7.5
     version: 1.7.5
@@ -688,62 +688,62 @@ packages:
       - supports-color
     dev: true
 
-  /@roenlie/lit-aegis@1.0.17(lit@3.1.0):
-    resolution: {integrity: sha512-QtS1CZibl2LS/ytA6S/lFUGQ6HtNBHXNaMOp/3xN7XBHEogUV39w/TPbbxZ0CFYB1UL+QN1QOAtbfMXfW1gCng==}
+  /@roenlie/lit-aegis@1.0.18(lit@3.1.0):
+    resolution: {integrity: sha512-iMZxyFormaVDeIpVGRURVhuLKBMub3xY6dtK2rSzHtKeA2PPTdImtvcCkj4XV0naQXt4pUe4W+LntLUKQwObZg==}
     peerDependencies:
       lit: '*'
     dependencies:
-      '@roenlie/mimic-core': 0.0.58
+      '@roenlie/mimic-core': 0.0.59
       inversify: 6.0.2
       lit: 3.1.0
       reflect-metadata: 0.1.13
     dev: false
 
-  /@roenlie/lit-context@1.0.17(lit@3.1.0):
-    resolution: {integrity: sha512-yVaYhsCbvrwh35CAnOVvUof2jgPfDpz25tSc7SHGtIno/3OvtzFQKisofYJQ9GsELIf8Pil/pFuqRQqlaUBk2A==}
+  /@roenlie/lit-context@1.0.18(lit@3.1.0):
+    resolution: {integrity: sha512-LFu/cx2m8t0b/d38mdJ+C8lxXfv34+z9bn7jH9oEcv98e/tmqEwltLmXC/kAqHBId1BgCBSNV9XiKWPE8+Kxog==}
     peerDependencies:
       lit: '*'
     dependencies:
-      '@roenlie/mimic-core': 0.0.58
+      '@roenlie/mimic-core': 0.0.59
       lit: 3.1.0
     dev: false
 
-  /@roenlie/lit-state-store@0.0.26(lit@3.1.0):
-    resolution: {integrity: sha512-4m84rtVqkPLOC2awI2kX2+aHx20gfjKvsBt1WPm9VSh64BZZfpQq5UgDMXX56dhFZvWn3++QhdWWJ8ikQRHiMw==}
+  /@roenlie/lit-state-store@0.0.27(lit@3.1.0):
+    resolution: {integrity: sha512-CTIzL7qtlRYDTd41JO/yLOjiLu0793zoUELZ/6nzhbEPcOzdXQ5dkw0jZIYaU26Df4XkXTdAuBUEwVgS2f8ctw==}
     peerDependencies:
       lit: '*'
     dependencies:
-      '@roenlie/mimic-core': 0.0.58
+      '@roenlie/mimic-core': 0.0.59
       lit: 3.1.0
     dev: false
 
-  /@roenlie/mimic-core@0.0.58:
-    resolution: {integrity: sha512-HqZHil/OXhbHyNww8qncAeO328TFS5sU+iXWNnLWXnujpaMWZTmHsPX02JG5iqvTrRKoD7yBXHbZWsNTaPFD3A==}
+  /@roenlie/mimic-core@0.0.59:
+    resolution: {integrity: sha512-k73SK7hpCdcp833UUSXXD2yFJsWEstvxDT4BUF1oHd95Dhd6L0pJ8w4yo4NRz22UDXrA7aylxmfZsRxplTswhw==}
     dependencies:
       nanoid: 5.0.3
       ts-toolbelt: 9.6.0
     dev: false
 
-  /@roenlie/mimic-elements@0.0.53(lit@3.1.0):
-    resolution: {integrity: sha512-DSW/WyA9yZyD56IkauOuKuiMCercikfJv/cpW3oYHjAq/5rB7tgHCN2dqgCpxc7/B96rSFgcEFsEqwD9CbcERA==}
+  /@roenlie/mimic-elements@0.0.54(lit@3.1.0):
+    resolution: {integrity: sha512-15XvhS67Gw9hSjDVEPat1CS4TAfO2iprkhtB0PMmGtFq3hbOpuIMRzGWJbMRRNUz0ZUIfZookIvX3wwjmA3nGQ==}
     peerDependencies:
       lit: '*'
     dependencies:
       '@floating-ui/dom': 1.5.3
-      '@roenlie/lit-aegis': 1.0.17(lit@3.1.0)
-      '@roenlie/mimic-core': 0.0.58
-      '@roenlie/mimic-lit': 0.0.68(lit@3.1.0)
-      '@roenlie/mimic-localize': 0.0.29(lit@3.1.0)
+      '@roenlie/lit-aegis': 1.0.18(lit@3.1.0)
+      '@roenlie/mimic-core': 0.0.59
+      '@roenlie/mimic-lit': 0.0.69(lit@3.1.0)
+      '@roenlie/mimic-localize': 0.0.30(lit@3.1.0)
       lit: 3.1.0
     dev: false
 
-  /@roenlie/mimic-lit@0.0.68(lit@3.1.0):
-    resolution: {integrity: sha512-73V/DlKrtY69zNjsvQenHh3QcZtOPKreRWnFOev8VA7UqUOlsF3yNSqa5W11KZEvE/b+RC0p8ULTHfhQibxjJQ==}
+  /@roenlie/mimic-lit@0.0.69(lit@3.1.0):
+    resolution: {integrity: sha512-LYOODCPQ8k+Qo1Advim8aWWD9rnljEcgecB/U+kKd0GFAShF9CafQ3hm/uoHWrNEFuYaTLWJ/3zaNaDdHxoHpg==}
     peerDependencies:
       lit: '*'
     dependencies:
       '@floating-ui/dom': 1.5.3
-      '@roenlie/mimic-core': 0.0.58
+      '@roenlie/mimic-core': 0.0.59
       fast-equals: 5.0.1
       inversify: 6.0.2
       lit: 3.1.0
@@ -751,12 +751,12 @@ packages:
       reflect-metadata: 0.1.13
     dev: false
 
-  /@roenlie/mimic-localize@0.0.29(lit@3.1.0):
-    resolution: {integrity: sha512-R28JYiLvyykmH7znXpXwoFc0VjDZeWp5LzhkFCr/KTtI3v/uS+mxRHFBKBSRIk1vs+KF9Mkt118P/EPRRBXFsQ==}
+  /@roenlie/mimic-localize@0.0.30(lit@3.1.0):
+    resolution: {integrity: sha512-seII3kNMDZutMEFeR0uSWFdYXQVJGpYuyxvlDbMd6BhcRg9TeXkEIshwdbZzo1Ciw9EwOJ/sKGCZ1OqKdgP76w==}
     peerDependencies:
       lit: '*'
     dependencies:
-      '@roenlie/mimic-core': 0.0.58
+      '@roenlie/mimic-core': 0.0.59
       lit: 3.1.0
     dev: false
 
