@@ -21,6 +21,11 @@ export interface CommonBonesOreAndHides {
 export interface OtherBonesOreAndHides extends Record<string, number> {}
 export interface MonsterParts extends Record<string, Record<string, number>> {}
 export interface Inventory extends Record<string, number> {}
+
+//export type OtherBonesOreAndHides = {key: string, value: number}[];
+//export type MonsterParts = {key: string, value: {key: string, value: number}}[];
+//export type Inventory = {key: string, value: number}[];
+
 export interface CampaignDay {
 	campaignId: string;
 	day: number;

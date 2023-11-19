@@ -15,20 +15,20 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1
   '@roenlie/lit-context':
-    specifier: ^1.0.16
-    version: 1.0.16(lit@3.1.0)
+    specifier: ^1.0.17
+    version: 1.0.17(lit@3.1.0)
   '@roenlie/lit-state-store':
-    specifier: ^0.0.25
-    version: 0.0.25(lit@3.1.0)
+    specifier: ^0.0.26
+    version: 0.0.26(lit@3.1.0)
   '@roenlie/mimic-core':
-    specifier: ^0.0.57
-    version: 0.0.57
+    specifier: ^0.0.58
+    version: 0.0.58
   '@roenlie/mimic-elements':
-    specifier: ^0.0.52
-    version: 0.0.52(lit@3.1.0)
+    specifier: ^0.0.53
+    version: 0.0.53(lit@3.1.0)
   '@roenlie/mimic-lit':
-    specifier: ^0.0.67
-    version: 0.0.67(lit@3.1.0)
+    specifier: ^0.0.68
+    version: 0.0.68(lit@3.1.0)
   '@vaadin/router':
     specifier: ^1.7.5
     version: 1.7.5
@@ -50,8 +50,8 @@ devDependencies:
     specifier: ^1.0.2
     version: 1.0.2
   '@types/node':
-    specifier: ^20.9.1
-    version: 20.9.1
+    specifier: ^20.9.2
+    version: 20.9.2
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.11.0
     version: 6.11.0(@typescript-eslint/parser@6.11.0)(eslint@8.54.0)(typescript@5.2.2)
@@ -77,14 +77,14 @@ devDependencies:
     specifier: ^5.0.5
     version: 5.0.5
   tsx:
-    specifier: ^4.1.3
-    version: 4.1.3
+    specifier: ^4.1.4
+    version: 4.1.4
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
   vite:
     specifier: ^5.0.0
-    version: 5.0.0(@types/node@20.9.1)
+    version: 5.0.0(@types/node@20.9.2)
   vitest:
     specifier: ^0.34.6
     version: 0.34.6
@@ -688,62 +688,62 @@ packages:
       - supports-color
     dev: true
 
-  /@roenlie/lit-aegis@1.0.16(lit@3.1.0):
-    resolution: {integrity: sha512-M653Zr3uzqjQGFyb0uf+T26UCPxDKGoDyX+OzqEbo5RY0n7M/iFW8nWN+kfBb1RXl1uHE96bRqk5yTMvP/3YZQ==}
+  /@roenlie/lit-aegis@1.0.17(lit@3.1.0):
+    resolution: {integrity: sha512-QtS1CZibl2LS/ytA6S/lFUGQ6HtNBHXNaMOp/3xN7XBHEogUV39w/TPbbxZ0CFYB1UL+QN1QOAtbfMXfW1gCng==}
     peerDependencies:
       lit: '*'
     dependencies:
-      '@roenlie/mimic-core': 0.0.57
+      '@roenlie/mimic-core': 0.0.58
       inversify: 6.0.2
       lit: 3.1.0
       reflect-metadata: 0.1.13
     dev: false
 
-  /@roenlie/lit-context@1.0.16(lit@3.1.0):
-    resolution: {integrity: sha512-E1XHaBgRoJHVPAefGeqjvkBd8TtZVU1TTVFE5rd/5fXYWplxIzp11wb7XUY6XsYb3PundWTtGaThWH8zqbrFhA==}
+  /@roenlie/lit-context@1.0.17(lit@3.1.0):
+    resolution: {integrity: sha512-yVaYhsCbvrwh35CAnOVvUof2jgPfDpz25tSc7SHGtIno/3OvtzFQKisofYJQ9GsELIf8Pil/pFuqRQqlaUBk2A==}
     peerDependencies:
       lit: '*'
     dependencies:
-      '@roenlie/mimic-core': 0.0.57
+      '@roenlie/mimic-core': 0.0.58
       lit: 3.1.0
     dev: false
 
-  /@roenlie/lit-state-store@0.0.25(lit@3.1.0):
-    resolution: {integrity: sha512-KCNIUKRed75vdDSebmSTu/yRp73kQYc0v0QFoaBJq0nAXAqt1cBCOJ2KRklynIezXxzS8jydrrAsHQaYb3krKA==}
+  /@roenlie/lit-state-store@0.0.26(lit@3.1.0):
+    resolution: {integrity: sha512-4m84rtVqkPLOC2awI2kX2+aHx20gfjKvsBt1WPm9VSh64BZZfpQq5UgDMXX56dhFZvWn3++QhdWWJ8ikQRHiMw==}
     peerDependencies:
       lit: '*'
     dependencies:
-      '@roenlie/mimic-core': 0.0.57
+      '@roenlie/mimic-core': 0.0.58
       lit: 3.1.0
     dev: false
 
-  /@roenlie/mimic-core@0.0.57:
-    resolution: {integrity: sha512-RY/Jo5SGI1IX44zNrTOHr3N2DhX4qjV+apJwNg/KfEnS36kdK+Q1RLmjZU4ppEZxhmgJnzBDygA6bHd4vxTKUg==}
+  /@roenlie/mimic-core@0.0.58:
+    resolution: {integrity: sha512-HqZHil/OXhbHyNww8qncAeO328TFS5sU+iXWNnLWXnujpaMWZTmHsPX02JG5iqvTrRKoD7yBXHbZWsNTaPFD3A==}
     dependencies:
       nanoid: 5.0.3
       ts-toolbelt: 9.6.0
     dev: false
 
-  /@roenlie/mimic-elements@0.0.52(lit@3.1.0):
-    resolution: {integrity: sha512-ci513h9NorF5ndrdLz4ciQeE6hrj0G4I6o8NmZZpxIoEKJFp2FxE6M1O6pZhypgXuFVOVC698pOpDiuC/EcTbw==}
+  /@roenlie/mimic-elements@0.0.53(lit@3.1.0):
+    resolution: {integrity: sha512-DSW/WyA9yZyD56IkauOuKuiMCercikfJv/cpW3oYHjAq/5rB7tgHCN2dqgCpxc7/B96rSFgcEFsEqwD9CbcERA==}
     peerDependencies:
       lit: '*'
     dependencies:
       '@floating-ui/dom': 1.5.3
-      '@roenlie/lit-aegis': 1.0.16(lit@3.1.0)
-      '@roenlie/mimic-core': 0.0.57
-      '@roenlie/mimic-lit': 0.0.67(lit@3.1.0)
-      '@roenlie/mimic-localize': 0.0.28(lit@3.1.0)
+      '@roenlie/lit-aegis': 1.0.17(lit@3.1.0)
+      '@roenlie/mimic-core': 0.0.58
+      '@roenlie/mimic-lit': 0.0.68(lit@3.1.0)
+      '@roenlie/mimic-localize': 0.0.29(lit@3.1.0)
       lit: 3.1.0
     dev: false
 
-  /@roenlie/mimic-lit@0.0.67(lit@3.1.0):
-    resolution: {integrity: sha512-e5luH4KXctg53/6kuxSjrIlqWxlEtbJS78ZdUiBP5E3SP7/S06rR6FlEGlwW5+gt0UxKPZGfn2VDNlneMc5qvA==}
+  /@roenlie/mimic-lit@0.0.68(lit@3.1.0):
+    resolution: {integrity: sha512-73V/DlKrtY69zNjsvQenHh3QcZtOPKreRWnFOev8VA7UqUOlsF3yNSqa5W11KZEvE/b+RC0p8ULTHfhQibxjJQ==}
     peerDependencies:
       lit: '*'
     dependencies:
       '@floating-ui/dom': 1.5.3
-      '@roenlie/mimic-core': 0.0.57
+      '@roenlie/mimic-core': 0.0.58
       fast-equals: 5.0.1
       inversify: 6.0.2
       lit: 3.1.0
@@ -751,12 +751,12 @@ packages:
       reflect-metadata: 0.1.13
     dev: false
 
-  /@roenlie/mimic-localize@0.0.28(lit@3.1.0):
-    resolution: {integrity: sha512-LodsGhVbyaiu0c8t3aAT2RaCN18oMK3mVH0Ba6ad3pmCnRFNNc9yU1hFydGHrmiww4qBs8HrDlyES4I/Zf2qgQ==}
+  /@roenlie/mimic-localize@0.0.29(lit@3.1.0):
+    resolution: {integrity: sha512-R28JYiLvyykmH7znXpXwoFc0VjDZeWp5LzhkFCr/KTtI3v/uS+mxRHFBKBSRIk1vs+KF9Mkt118P/EPRRBXFsQ==}
     peerDependencies:
       lit: '*'
     dependencies:
-      '@roenlie/mimic-core': 0.0.57
+      '@roenlie/mimic-core': 0.0.58
       lit: 3.1.0
     dev: false
 
@@ -906,8 +906,8 @@ packages:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: true
 
-  /@types/node@20.9.1:
-    resolution: {integrity: sha512-HhmzZh5LSJNS5O8jQKpJ/3ZcrrlG6L70hpGqMIAoM9YVD0YBRNWYsfwcXq8VnSjlNpCpgLzMXdiPo+dxcvSmiA==}
+  /@types/node@20.9.2:
+    resolution: {integrity: sha512-WHZXKFCEyIUJzAwh3NyyTHYSR35SevJ6mZ1nWwJafKtiQbqRTIKSRcw3Ma3acqgsent3RRDqeVwpHntMk+9irg==}
     dependencies:
       undici-types: 5.26.5
     dev: true
@@ -3518,8 +3518,8 @@ packages:
       typescript: 5.2.2
     dev: true
 
-  /tsx@4.1.3:
-    resolution: {integrity: sha512-DLiTy1eri4nhqgVVy+15YKC6Ij2BMFxGdDMkVrSDkNuISUJLv7n0NgZpFLpdM+qmwXar34XllgYi4cxkNMbDwQ==}
+  /tsx@4.1.4:
+    resolution: {integrity: sha512-9X7uBCIyUsvMzIH+o8m+5o/5eL461cChCF+XUtOZsPr1a4pZx2lTQx0Muu5G5VwJWZwAGKBe3sJHLk82BENAVw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     dependencies:
@@ -3624,7 +3624,7 @@ packages:
       punycode: 2.3.1
     dev: true
 
-  /vite-node@0.34.6(@types/node@20.9.1):
+  /vite-node@0.34.6(@types/node@20.9.2):
     resolution: {integrity: sha512-nlBMJ9x6n7/Amaz6F3zJ97EBwR2FkzhBRxF5e+jE6LA3yi6Wtc2lyTij1OnDMIr34v5g/tVQtsVAzhT0jc5ygA==}
     engines: {node: '>=v14.18.0'}
     hasBin: true
@@ -3634,7 +3634,7 @@ packages:
       mlly: 1.4.2
       pathe: 1.1.1
       picocolors: 1.0.0
-      vite: 5.0.0(@types/node@20.9.1)
+      vite: 5.0.0(@types/node@20.9.2)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -3646,7 +3646,7 @@ packages:
       - terser
     dev: true
 
-  /vite@5.0.0(@types/node@20.9.1):
+  /vite@5.0.0(@types/node@20.9.2):
     resolution: {integrity: sha512-ESJVM59mdyGpsiNAeHQOR/0fqNoOyWPYesFto8FFZugfmhdHx8Fzd8sF3Q/xkVhZsyOxHfdM7ieiVAorI9RjFw==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -3674,7 +3674,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.9.1
+      '@types/node': 20.9.2
       esbuild: 0.19.5
       postcss: 8.4.31
       rollup: 4.4.1
@@ -3715,7 +3715,7 @@ packages:
     dependencies:
       '@types/chai': 4.3.10
       '@types/chai-subset': 1.3.5
-      '@types/node': 20.9.1
+      '@types/node': 20.9.2
       '@vitest/expect': 0.34.6
       '@vitest/runner': 0.34.6
       '@vitest/snapshot': 0.34.6
@@ -3734,8 +3734,8 @@ packages:
       strip-literal: 1.3.0
       tinybench: 2.5.1
       tinypool: 0.7.0
-      vite: 5.0.0(@types/node@20.9.1)
-      vite-node: 0.34.6(@types/node@20.9.1)
+      vite: 5.0.0(@types/node@20.9.2)
+      vite-node: 0.34.6(@types/node@20.9.2)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less

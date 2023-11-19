@@ -23,7 +23,13 @@ export class AppRouterCmp extends MimicElement {
 				//		location.replace(window.location.href + '.html');
 				//	},
 				//},
-				{ path: '/', redirect: '/campaign-list' },
+				{ path: '/', redirect: '/introduction' },
+				{
+					path:   '/introduction',
+					action: this.routeComponent(
+						() => import('../../pages/introduction/introduction-page.cmp.js'),
+					),
+				},
 				{
 					path:   '/campaign-list',
 					action: this.routeComponent(
@@ -42,18 +48,23 @@ export class AppRouterCmp extends MimicElement {
 						() => import('../../pages/campaign-tracker/campaign-tracker-page.cmp.js'),
 					),
 				},
+				{
+					path:   '/settings',
+					action: this.routeComponent(
+						() => import('../../pages/settings/settings-page.cmp.js'),
+					),
+				},
 			],
 		},
 		{
 			path:     '(.*)',
-			redirect: baseUrl + '/campaign-list',
+			redirect: baseUrl + '/introduction',
 		},
 	];
 
 	public override connectedCallback(): void {
 		super.connectedCallback();
 
-		this.router.baseUrl = '/mh-notes';
 		this.router.setOutlet(this.shadowRoot);
 		this.router.setRoutes(this.routes);
 	}

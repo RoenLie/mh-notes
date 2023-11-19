@@ -14,7 +14,7 @@ import type { CampaignTracker } from '../campaign-tracker.js';
 export class CampaignHuntersLog extends MimicElement {
 
 	protected static createKeyFromChange(change: Change) {
-		return camelCaseToWords(change.key.split('.').slice(1).join(' '));
+		return camelCaseToWords(change.path.split('.').slice(1).join(' '));
 	}
 
 	@property({ type: Object }) public campaignTracker: CampaignTracker;
@@ -47,7 +47,7 @@ export class CampaignHuntersLog extends MimicElement {
 		const days = structuredClone(campaign.days.slice(0, campaign.day.value));
 
 		const diffs = days.map((current, index) => index === 0 ? [] : getChangedKeys(days[index - 1]!, current))
-			.map(arr => arr.filter(change => change && change.key !== 'day' && change.key !== 'campaignId'));
+			.map(arr => arr.filter(change => change && change.path !== 'day' && change.path !== 'campaignId'));
 
 		return html`
 		<h2>
@@ -162,10 +162,20 @@ export class CampaignHuntersLog extends MimicElement {
 }
 
 
-interface Change { key: string; oldValue?: any; newValue?: any; }
+interface Change { path: string; oldValue?: any; newValue?: any; }
+
+const traces = new WeakSet();
 
 const getChangedKeys = (obj1: Record<keyof any, any>, obj2?: Record<keyof any, any>, parentKey = ''): Change[] => {
-	const changedKeys: { key: string; oldValue?: any; newValue?: any }[] = [];
+	const changedKeys: Change[] = [];
+
+	if (traces.has(obj1) || (obj2 && traces.has(obj2))) {
+		return changedKeys;
+	}
+	else {
+		traces.add(obj1);
+		obj2 && traces.add(obj2);
+	}
 
 	// Check keys in obj1
 	for (const key in obj1) {
@@ -185,7 +195,7 @@ const getChangedKeys = (obj1: Record<keyof any, any>, obj2?: Record<keyof any, a
 				changedKeys.push(...nestedChanges);
 			}
 			else {
-				changedKeys.push({ key: currentKey, oldValue: obj1[key], newValue: obj2?.[key] });
+				changedKeys.push({ path: currentKey, oldValue: obj1[key], newValue: obj2?.[key] });
 			}
 		}
 	}
@@ -200,7 +210,7 @@ const getChangedKeys = (obj1: Record<keyof any, any>, obj2?: Record<keyof any, a
 				changedKeys.push(...nestedChanges);
 			}
 			else {
-				changedKeys.push({ key: currentKey, oldValue: undefined, newValue: obj2[key] });
+				changedKeys.push({ path: currentKey, oldValue: undefined, newValue: obj2[key] });
 			}
 		}
 	}

@@ -95,9 +95,9 @@ export class CampaignSelectorPage extends MimicElement {
 			display: grid;
 			grid-template-rows: 1fr max-content;
 			padding-bottom: 40px;
-		}
-		s-scroll-wrapper::-webkit-scrollbar {
-			display: none;
+
+			--scrollbar-thumb-bg: var(--md-surface-container-highest);
+			--scrollbar-width: 2px;
 		}
 		ul,li {
 			all: unset;

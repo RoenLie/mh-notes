@@ -18,6 +18,11 @@ export class NavbarCmp extends MimicElement {
 
 	protected nav: { pathname: string; iconUrl: string; visible: () => boolean; }[] = [
 		{
+			pathname: '/introduction',
+			iconUrl:  'https://icons.getbootstrap.com/assets/icons/bookmark.svg',
+			visible:  () => true,
+		},
+		{
 			pathname: '/campaign-list',
 			iconUrl:  'https://icons.getbootstrap.com/assets/icons/list-ul.svg',
 			visible:  () => true,
@@ -26,6 +31,11 @@ export class NavbarCmp extends MimicElement {
 			pathname: '/campaign-tracker',
 			iconUrl:  'https://icons.getbootstrap.com/assets/icons/vignette.svg',
 			visible:  () => SearchParams.has('campaign-id'),
+		},
+		{
+			pathname: '/settings',
+			iconUrl:  'https://icons.getbootstrap.com/assets/icons/sliders.svg',
+			visible:  () => true,
 		},
 	];
 
