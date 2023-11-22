@@ -33,6 +33,7 @@ export interface CampaignDay {
 	otherBonesOreAndHides: OtherBonesOreAndHides;
 	monsterParts: MonsterParts;
 	inventory: Inventory;
+	notes: string;
 }
 export interface Campaign {
 	campaignId: string;
@@ -79,6 +80,7 @@ export class CampaignTracker {
 				dragonveinCrystal: 0,
 				wingdrakeHide:     0,
 			},
+			notes: '',
 		},
 	];
 
@@ -134,6 +136,11 @@ export class CampaignTracker {
 		this.campaignName   = campaign.campaignName;
 		this.campaignLength = campaign.campaignLength;
 		this.lastUpdated    = campaign.lastUpdated;
+
+		/** Temp data migration */
+		this.days.forEach(day => {
+			day.notes ??= '';
+		});
 	}
 
 	public deleteCampaign() {

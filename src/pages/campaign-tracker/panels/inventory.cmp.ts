@@ -1,12 +1,14 @@
 import { SignalWatcher } from '@lit-labs/preact-signals';
 import type { EventOf } from '@roenlie/mimic-core/dom';
 import { camelCaseToWords } from '@roenlie/mimic-core/string';
+import { throttle } from '@roenlie/mimic-core/timing';
 import { MMButton } from '@roenlie/mimic-elements/button';
 import { MMInput } from '@roenlie/mimic-elements/input';
 import { customElement, MimicElement } from '@roenlie/mimic-lit/element';
 import { sharedStyles } from '@roenlie/mimic-lit/styles';
-import { css, html } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
+import { live } from 'lit/directives/live.js';
 import { map } from 'lit/directives/map.js';
 import { createRef, type Ref, ref } from 'lit/directives/ref.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -24,7 +26,7 @@ export class CampaignInventory extends MimicElement {
 
 	@property({ type: Object }) public campaignTracker: CampaignTracker;
 
-	protected refMap = new Map<string, Ref<HTMLElement>>();
+	protected refMap = new Map<string, Ref<LitElement>>();
 
 	protected get current() {
 		return this.campaignTracker.currentCampaignDay;
@@ -34,6 +36,22 @@ export class CampaignInventory extends MimicElement {
 		super.disconnectedCallback();
 
 		this.refMap.clear();
+	}
+
+	protected renderNotes() {
+		return html`
+		<h3>
+			Notes
+		</h3>
+		<s-textarea>
+			<textarea
+				spellcheck =false
+				placeholder="Notes on todays campaign day"
+				.value     =${ live(this.current.notes) }
+				@change    =${ (ev: EventOf<HTMLTextAreaElement>) => this.current.notes = ev.target.value }
+			></textarea>
+		</s-textarea>
+		`;
 	}
 
 	protected renderCommonBonesOreAndHides() {
@@ -57,6 +75,11 @@ export class CampaignInventory extends MimicElement {
 		`;
 	}
 
+	protected toggleDisabled = throttle((el: LitElement | undefined, force?: boolean) => {
+		el?.toggleAttribute('disabled', force);
+		this.requestUpdate();
+	}, 0);
+
 	protected renderItem(
 		id: string,
 		key: {label?: string, value: string},
@@ -66,18 +89,41 @@ export class CampaignInventory extends MimicElement {
 		onDelete: () => void,
 	) {
 		const elRef = this.refMap.get(id) ??
-			(() => this.refMap.set(id, createRef<HTMLElement>()).get(id)!)();
+			(() => this.refMap.set(id, createRef<MMInput>()).get(id)!)();
 
-		const isDisabled = elRef.value?.hasAttribute('disabled') ?? true;
+		let isDisabled = false;
+		if (!elRef.value)
+			isDisabled = true;
+		else if (!key.value)
+			isDisabled = false;
+		else
+			isDisabled = elRef.value.hasAttribute('disabled');
+
+		if (!elRef.value) {
+			// check immediatly after first render to see if label has a value.
+			// If it does not, it means it's probably a new field.
+			// then we make it not disabled to easily add data to it.
+			this.updateComplete.then(() => {
+				if (!key.value)
+					this.toggleDisabled(elRef.value, false);
+			});
+		}
 
 		return html`
 		<s-record>
 			<mm-input
 				${ ref(elRef) }
-				label=${ key.label ?? 'Item Name' }
-				.value=${ key.value }
+				label    =${ key.label ?? 'Item Name' }
+				.value   =${ key.value }
 				disabled
-				@change=${ onKeyChange }
+				?disabled=${ isDisabled }
+				@change  =${ onKeyChange }
+				@blur    =${ () => {
+					if (!key.value)
+						return;
+
+					this.toggleDisabled(elRef.value, true);
+				} }
 			>
 				<mm-button
 					slot="end"
@@ -85,8 +131,11 @@ export class CampaignInventory extends MimicElement {
 					size="x-small"
 					variant="elevated"
 					@click=${ () => {
-						elRef.value?.toggleAttribute('disabled');
-						this.requestUpdate();
+						const inputEl = elRef.value?.shadowRoot?.querySelector('input');
+						if (inputEl?.matches(':focus-within'))
+							return;
+
+						this.toggleDisabled(elRef.value);
 					} }
 				>
 					${ when(isDisabled, () => html`
@@ -185,7 +234,7 @@ export class CampaignInventory extends MimicElement {
 			<s-monster-parts>
 			${ map(monster.value ?? [], (item, iItem) => {
 				return this.renderItem(
-					monster + '-' + iItem,
+					'monsterParts-' + mIndex + '-' + monster.key + '-' + iItem,
 					{ value: item.key },
 					item.value.toString() ?? '',
 					ev => {
@@ -267,9 +316,8 @@ export class CampaignInventory extends MimicElement {
 		<h2>
 			Inventory
 		</h2>
-		<mm-input
-			label="health potions"
-		></mm-input>
+		<hr>
+		${ this.renderNotes() }
 		<hr>
 		${ this.renderCommonBonesOreAndHides() }
 		<hr>
@@ -278,6 +326,13 @@ export class CampaignInventory extends MimicElement {
 		${ this.renderMonsterParts() }
 		<hr>
 		${ this.renderInventory() }
+		<hr>
+		<h3>
+			Party items
+		</h3>
+		<mm-input
+			label="health potions"
+		></mm-input>
 		`;
 	}
 
@@ -308,6 +363,22 @@ export class CampaignInventory extends MimicElement {
 			width: 100%;
 			border: 1px solid var(--md-surface-container-highest);
 		}
+		s-textarea {
+			overflow: hidden;
+			display: grid;
+			height: 200px;
+		}
+		textarea {
+			all: unset;
+			color: rgb(var(--mm-color-on-surface) / 0.87);
+			background-color: rgb(var(--mm-color-on-surface) / .04);
+			border-bottom: 1px solid rgb(var(--mm-color-on-surface) / 0.6);
+			padding-block: 6px;
+			padding-inline: 12px;
+		}
+		textarea::placeholder {
+			color: rgb(var(--mm-color-on-surface) / 0.6);
+		}
 		s-input-wrapper {
 			display: grid;
 			place-content: center;
@@ -327,7 +398,7 @@ export class CampaignInventory extends MimicElement {
 			grid-column: 3/4;
 		}
 		.add-button {
-			padding-top: 24px;
+			margin-top: 24px;
 		}
 		`,
 	];

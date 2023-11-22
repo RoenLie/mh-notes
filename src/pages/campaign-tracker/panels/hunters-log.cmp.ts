@@ -1,6 +1,6 @@
 import { SignalWatcher } from '@lit-labs/preact-signals';
 import { camelCaseToWords } from '@roenlie/mimic-core/string';
-import { type Change, getObjectDiff, readPath } from '@roenlie/mimic-core/structs';
+import { type Change, readPath } from '@roenlie/mimic-core/structs';
 import { customElement, MimicElement } from '@roenlie/mimic-lit/element';
 import { sharedStyles } from '@roenlie/mimic-lit/styles';
 import { css, html } from 'lit';
@@ -8,6 +8,7 @@ import { property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
 import type { CampaignTracker, Item, Monster } from '../campaign-tracker.js';
+import { getObjectDiff } from '../object-diff.js';
 
 
 @SignalWatcher
