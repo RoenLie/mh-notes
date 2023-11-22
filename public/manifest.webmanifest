@@ -19,9 +19,9 @@
 	],
 	"id": "/?source=pwa",
 	"start_url": "/?source=pwa",
-	"background_color": "#3367D6",
+	"background_color": "#2e3641",
 	"scope": "/",
-	"theme_color": "#3367D6",
+	"theme_color": "#a03724",
 	"shortcuts": [],
 	"description": "Your friend on the journey through monster hunter board game campaigns.",
 	"screenshots": []
