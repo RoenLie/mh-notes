@@ -1,0 +1,28 @@
+{
+	"short_name": "MHNotes",
+	"name": "Monster Hunter Notes",
+	"display_override": [
+		"window-control-overlay"
+	],
+	"display": "standalone",
+	"icons": [
+		{
+			"src": "/mh-notes/pwa/icon_192.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		},
+		{
+			"src": "/mh-notes/pwa/icon_512.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		}
+	],
+	"id": "/?source=pwa",
+	"start_url": "/?source=pwa",
+	"background_color": "#3367D6",
+	"scope": "/",
+	"theme_color": "#3367D6",
+	"shortcuts": [],
+	"description": "Your friend on the journey through monster hunter board game campaigns.",
+	"screenshots": []
+}
