@@ -20,7 +20,7 @@
 	"id": "/mh-notes/?source=pwa",
 	"start_url": "/mh-notes/?source=pwa",
 	"background_color": "#2e3641",
-	"scope": "/",
+	"scope": "/mh-notes/",
 	"theme_color": "#a03724",
 	"shortcuts": [],
 	"description": "Your friend on the journey through monster hunter board game campaigns.",
