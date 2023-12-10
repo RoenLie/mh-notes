@@ -1,5 +1,5 @@
 import { SignalWatcher } from '@lit-labs/preact-signals';
-import type { EventOf } from '@roenlie/mimic-core/dom';
+import { emitEvent, type EventOf } from '@roenlie/mimic-core/dom';
 import { camelCaseToWords } from '@roenlie/mimic-core/string';
 import { throttle } from '@roenlie/mimic-core/timing';
 import { MMButton } from '@roenlie/mimic-elements/button';
@@ -10,11 +10,10 @@ import { css, html, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
 import { map } from 'lit/directives/map.js';
-import { createRef, type Ref, ref } from 'lit/directives/ref.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { when } from 'lit/directives/when.js';
 
-import type { CampaignTracker } from '../campaign-tracker.js';
+import type { CampaignTracker, CommonBonesOreAndHides } from '../campaign-tracker.js';
 
 MMInput.register();
 MMButton.register();
@@ -26,16 +25,14 @@ export class CampaignInventory extends MimicElement {
 
 	@property({ type: Object }) public campaignTracker: CampaignTracker;
 
-	protected refMap = new Map<string, Ref<LitElement>>();
 
 	protected get current() {
 		return this.campaignTracker.currentCampaignDay;
 	}
 
-	public override disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		this.refMap.clear();
+	protected saveAndUpdate() {
+		this.campaignTracker.saveCampaign();
+		emitEvent(this, 'campaign-saved');
 	}
 
 	protected renderNotes() {
@@ -48,28 +45,51 @@ export class CampaignInventory extends MimicElement {
 				spellcheck =false
 				placeholder="Notes on todays campaign day"
 				.value     =${ live(this.current.notes) }
-				@change    =${ (ev: EventOf<HTMLTextAreaElement>) => this.current.notes = ev.target.value }
+				@change    =${ (ev: EventOf<HTMLTextAreaElement>) => {
+					this.current.notes = ev.target.value;
+					this.saveAndUpdate();
+				} }
 			></textarea>
 		</s-textarea>
 		`;
 	}
 
 	protected renderCommonBonesOreAndHides() {
+		const { commonBonesOreAndHides } = this.current;
+
 		return html`
 		<h3>
 			Common Bones, Ore and Hides.
 		</h3>
 		<s-input-wrapper>
-			${ repeat(Object.keys(this.current.commonBonesOreAndHides), k => k, key => html`
-			<mm-input
-				label  =${ camelCaseToWords(key) }
-				type   ="number"
-				.value =${ (this.current.commonBonesOreAndHides as any)[key].toString() }
-				@change=${ (ev: EventOf<MMInput>) =>{
-					(this.current.commonBonesOreAndHides as any)[key] = ev.target.valueAsNumber;
-					this.requestUpdate();
-				} }
-			></mm-input>
+			${ repeat(Object.keys(commonBonesOreAndHides) as any, k => k, (key: keyof CommonBonesOreAndHides) => html`
+			<s-incr-field>
+				<mm-input
+					readonly
+					label  =${ camelCaseToWords(key) }
+					type   ="number"
+					.value =${ commonBonesOreAndHides[key].toString() }
+					@change=${ (ev: EventOf<MMInput>) =>{
+						commonBonesOreAndHides[key] = ev.target.valueAsNumber;
+						this.saveAndUpdate();
+					} }
+				></mm-input>
+
+				<mm-button type="icon" size="small" @click=${ () => {
+					commonBonesOreAndHides[key] += 1;
+					this.saveAndUpdate();
+				} }>
+					<mm-icon url="https://icons.getbootstrap.com/assets/icons/plus-lg.svg"></mm-icon>
+				</mm-button>
+
+				<mm-button type="icon" size="small" @click=${ () => {
+					const val = commonBonesOreAndHides[key];
+					commonBonesOreAndHides[key] = Math.max(0, val - 1);
+					this.saveAndUpdate();
+				} }>
+					<mm-icon url="https://icons.getbootstrap.com/assets/icons/dash-lg.svg"></mm-icon>
+				</mm-button>
+			</s-incr-field>
 			`) }
 		</s-input-wrapper>
 		`;
@@ -80,90 +100,49 @@ export class CampaignInventory extends MimicElement {
 		this.requestUpdate();
 	}, 0);
 
-	protected renderItem(
-		id: string,
+	protected renderItem(options: {
 		key: {label?: string, value: string},
 		value: string | undefined,
-		onKeyChange: (ev: EventOf<MMInput>) => void,
-		onValueChange: (ev: EventOf<MMInput>) => void,
 		onDelete: () => void,
-	) {
-		const elRef = this.refMap.get(id) ??
-			(() => this.refMap.set(id, createRef<MMInput>()).get(id)!)();
-
-		let isDisabled = false;
-		if (!elRef.value)
-			isDisabled = true;
-		else if (!key.value)
-			isDisabled = false;
-		else
-			isDisabled = elRef.value.hasAttribute('disabled');
-
-		if (!elRef.value) {
-			// check immediatly after first render to see if label has a value.
-			// If it does not, it means it's probably a new field.
-			// then we make it not disabled to easily add data to it.
-			this.updateComplete.then(() => {
-				if (!key.value)
-					this.toggleDisabled(elRef.value, false);
-			});
-		}
-
+		onKeyChange: (ev: EventOf<MMInput>) => void,
+		onIncrement?: (ev: PointerEvent) => void,
+		onDecrement?: (ev: PointerEvent) => void,
+	}) {
 		return html`
 		<s-record>
-			<mm-input
-				${ ref(elRef) }
-				label    =${ key.label ?? 'Item Name' }
-				.value   =${ key.value }
-				disabled
-				?disabled=${ isDisabled }
-				@change  =${ onKeyChange }
-				@blur    =${ () => {
-					if (!key.value)
-						return;
-
-					this.toggleDisabled(elRef.value, true);
-				} }
-			>
-				<mm-button
-					slot="end"
-					type="icon"
-					size="x-small"
-					variant="elevated"
-					@click=${ () => {
-						const inputEl = elRef.value?.shadowRoot?.querySelector('input');
-						if (inputEl?.matches(':focus-within'))
-							return;
-
-						this.toggleDisabled(elRef.value);
-					} }
-				>
-					${ when(isDisabled, () => html`
-					<mm-icon url="https://icons.getbootstrap.com/assets/icons/lock.svg"></mm-icon>
-					`, () => html`
-					<mm-icon url="https://icons.getbootstrap.com/assets/icons/unlock.svg"></mm-icon>
-					`) }
-				</mm-button>
-			</mm-input>
-
-			${ when(value !== undefined, () => html`
-			<mm-input
-				label  ="Amount"
-				type   ="number"
-				.value =${ value! }
-				@change=${ onValueChange }
-			></mm-input>
-			`) }
-
 			<mm-button
 				type="icon"
-				size="small"
-				@click=${ onDelete }
+				size="x-small"
+				@click=${ options.onDelete }
 			>
 				<mm-icon
 					url="https://icons.getbootstrap.com/assets/icons/dash-square.svg"
 				></mm-icon>
 			</mm-button>
+
+			<mm-input
+				placeholder=${ options.key.label ?? 'Item Name' }
+				.value     =${ options.key.value }
+				@change    =${ options.onKeyChange }
+			>
+				${ when(options.value, () => html`
+				<s-count slot="end">
+					${ options.value }
+				</s-count>
+				`) }
+			</mm-input>
+
+			${ when(options.onIncrement, () => html`
+			<mm-button type="icon" size="small" @click=${ options.onIncrement }>
+				<mm-icon url="https://icons.getbootstrap.com/assets/icons/plus-lg.svg"></mm-icon>
+			</mm-button>
+			`) }
+
+			${ when(options.onDecrement, () => html`
+			<mm-button type="icon" size="small" @click=${ options.onDecrement }>
+				<mm-icon url="https://icons.getbootstrap.com/assets/icons/dash-lg.svg"></mm-icon>
+			</mm-button>
+			`) }
 		</s-record>
 		`;
 	}
@@ -174,31 +153,34 @@ export class CampaignInventory extends MimicElement {
 			Other Bones, Ore and Hides.
 		</h3>
 		${ map(this.current.otherBonesOreAndHides, (item, i) => {
-			return this.renderItem(
-				'otherBonesOreAndHides-' + i,
-				{ value: item.key },
-				item.value?.toString() ?? '',
-				ev => {
+			return this.renderItem({
+				key:         { value: item.key },
+				value:       item.value?.toString() ?? '',
+				onKeyChange: ev => {
 					item.key = ev.target.value;
-					this.requestUpdate();
+					this.saveAndUpdate();
 				},
-				ev => {
-					item.value = Number(ev.target.value);
-					this.requestUpdate();
+				onIncrement: () => {
+					item.value += 1;
+					this.saveAndUpdate();
 				},
-				() => {
+				onDecrement: () => {
+					item.value = Math.max(0, item.value - 1);
+					this.saveAndUpdate();
+				},
+				onDelete: () => {
 					const remove = confirm('Delete item?');
 					if (!remove)
 						return;
 
 					this.current.otherBonesOreAndHides.splice(i, 1);
-					this.requestUpdate();
+					this.saveAndUpdate();
 				},
-			);
+			});
 		}) }
 		<mm-button class="add-button" size="small" @click=${ () => {
 			this.current.otherBonesOreAndHides.push({ key: '', value: 0 });
-			this.requestUpdate();
+			this.saveAndUpdate();
 		} }>
 			Add Item
 		</mm-button>
@@ -212,54 +194,55 @@ export class CampaignInventory extends MimicElement {
 		</h3>
 		${ map(this.current.monsterParts, (monster, mIndex) => {
 			return html`
-			${ this.renderItem(
-				'monsterParts-' + mIndex,
-				{ label: 'Monster Name', value: monster.key },
-				undefined,
-				ev => {
+			${ this.renderItem({
+				key:         { label: 'Monster Name', value: monster.key },
+				value:       undefined,
+				onKeyChange: ev => {
 					monster.key = ev.target.value;
 					monster.value ??= [];
-					this.requestUpdate();
+					this.saveAndUpdate();
 				},
-				() => {},
-				() => {
+				onDelete: () => {
 					const remove = confirm('Delete monster?');
 					if (!remove)
 						return;
 
 					this.current.monsterParts.splice(mIndex, 1);
-					this.requestUpdate();
+					this.saveAndUpdate();
 				},
-			) }
+			}) }
 			<s-monster-parts>
 			${ map(monster.value ?? [], (item, iItem) => {
-				return this.renderItem(
-					'monsterParts-' + mIndex + '-' + monster.key + '-' + iItem,
-					{ value: item.key },
-					item.value.toString() ?? '',
-					ev => {
+				return this.renderItem({
+					key:         { value: item.key },
+					value:       item.value.toString() ?? '',
+					onKeyChange: ev => {
 						item.key = ev.target.value;
-						this.requestUpdate();
+						this.saveAndUpdate();
 					},
-					ev => {
-						item.value = Number(ev.target.value);
-						this.requestUpdate();
+					onIncrement: () => {
+						item.value += 1;
+						this.saveAndUpdate();
 					},
-					() => {
+					onDecrement: () => {
+						item.value = Math.max(0, item.value - 1);
+						this.saveAndUpdate();
+					},
+					onDelete: () => {
 						const remove = confirm('Delete item?');
 						if (!remove)
 							return;
 
 						monster.value?.splice(iItem, 1);
-						this.requestUpdate();
+						this.saveAndUpdate();
 					},
-				);
+				});
 			}) }
 			</s-monster-parts>
 
 			<mm-button class="add-button" size="small" @click=${ () => {
 				monster.value?.push({ key: '', value: 0 });
-				this.requestUpdate();
+				this.saveAndUpdate();
 			} }>
 				Add Item
 			</mm-button>
@@ -267,7 +250,7 @@ export class CampaignInventory extends MimicElement {
 		}) }
 		<mm-button class="add-button" size="small" @click=${ () => {
 			this.current.monsterParts.push({ key: '', value: [] });
-			this.requestUpdate();
+			this.saveAndUpdate();
 		} }>
 			Add Monster
 		</mm-button>
@@ -280,31 +263,34 @@ export class CampaignInventory extends MimicElement {
 			Inventory
 		</h3>
 		${ map(this.current.inventory, (item, i) => {
-			return this.renderItem(
-				'inventory-' + i,
-				{ value: item.key },
-				item.value.toString() ?? '',
-				ev => {
+			return this.renderItem({
+				key:         { value: item.key },
+				value:       item.value.toString() ?? '',
+				onKeyChange: ev => {
 					item.key = ev.target.value;
-					this.requestUpdate();
+					this.saveAndUpdate();
 				},
-				ev => {
-					item.value = Number(ev.target.value);
-					this.requestUpdate();
+				onIncrement: () => {
+					item.value += 1;
+					this.saveAndUpdate();
 				},
-				() => {
+				onDecrement: () => {
+					item.value = Math.max(0, item.value - 1);
+					this.saveAndUpdate();
+				},
+				onDelete: () => {
 					const remove = confirm('Delete item?');
 					if (!remove)
 						return;
 
 					this.current.inventory.splice(i, 1);
-					this.requestUpdate();
+					this.saveAndUpdate();
 				},
-			);
+			});
 		}) }
 		<mm-button class="add-button" size="small" @click=${ () => {
 			this.current.inventory.push({ key: '', value: 0 });
-			this.requestUpdate();
+			this.saveAndUpdate();
 		} }>
 			Add Item
 		</mm-button>
@@ -332,6 +318,10 @@ export class CampaignInventory extends MimicElement {
 		</h3>
 		<mm-input
 			label="health potions"
+			@change=${ (ev: EventOf<HTMLInputElement>) => {
+				this.current.healthPotions = Number(ev.target.value);
+				this.saveAndUpdate();
+			} }
 		></mm-input>
 		`;
 	}
@@ -381,21 +371,27 @@ export class CampaignInventory extends MimicElement {
 		}
 		s-input-wrapper {
 			display: grid;
-			place-content: center;
 			gap: 8px;
-			grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 		}
 		s-record {
 			display: grid;
-			grid-template-columns: 1fr 60px max-content;
+			grid-template-columns: max-content 1fr max-content max-content;
+			align-items: center;
+			gap: 8px;
+		}
+		s-count {
+			display: grid;
+			place-items: center;
+			padding: 4px;
+			border-left: 1px solid rgb(var(--mm-color-on-surface) / 0.6);
+			width: 3ch;
+			height: 100%;
+		}
+		s-incr-field {
+			display: grid;
+			grid-template-columns: 1fr max-content max-content;
 			align-items: center;
 			gap: 12px;
-		}
-		s-record mm-input:first-of-type:last-of-type {
-			grid-column: span 2;
-		}
-		s-record mm-button {
-			grid-column: 3/4;
 		}
 		.add-button {
 			margin-top: 24px;

@@ -5,7 +5,7 @@ import { MMButton } from '@roenlie/mimic-elements/button';
 import { MMIcon } from '@roenlie/mimic-elements/icon';
 import { customElement, MimicElement } from '@roenlie/mimic-lit/element';
 import { sharedStyles } from '@roenlie/mimic-lit/styles';
-import { css, html } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { eventOptions, query, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
@@ -195,6 +195,14 @@ export class CampaignTrackerPage extends MimicElement {
 		<s-scroll-wrapper
 			@scroll=${ this.handleScroll }
 			@touchstart=${ this.handleTouchstart }
+			@campaign-saved=${ () => {
+				this.panels.forEach(panel => {
+					const el = this.shadowRoot
+						?.querySelector(panel.tag._$litStatic$) as undefined | LitElement;
+
+					el?.requestUpdate();
+				});
+			} }
 		>
 			${ map(this.panels, panel => staticHtml`
 			<${ panel.tag }

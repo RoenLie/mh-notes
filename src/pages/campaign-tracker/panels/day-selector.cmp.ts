@@ -30,7 +30,6 @@ export class CampaignDaySelector extends MimicElement {
 		this.campaignTracker.day.value = target.campaignDay.day;
 	}
 
-
 	protected override render() {
 		const campaign = this.campaignTracker;
 
@@ -40,7 +39,7 @@ export class CampaignDaySelector extends MimicElement {
 		</h2>
 
 		<ul @click=${ this.handleClickCampaignDay }>
-		${ map(this.campaignTracker.days, day => html`
+		${ map(this.campaignTracker.days.toReversed(), day => html`
 			<li class=${ classMap({ active: campaign.day.value === day.day }) }
 				.campaignDay=${ day }
 			>
