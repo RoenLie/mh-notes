@@ -91,9 +91,6 @@ export class CampaignHuntersLog extends MimicElement {
 				// paths that are not interesting for diff purposes.
 				.filter(change => ![ 'notes' ].includes(change.path)));
 
-		console.log(diffs);
-
-
 		return html`
 		<h2>
 			Hunters Log
@@ -126,11 +123,11 @@ export class CampaignHuntersLog extends MimicElement {
 					${ this.renderChanges('Gained', gained) }
 					${ this.renderChanges('Lost', lost) }
 
-					${ when(days[dayIndex]?.notes, () => html`
+					${ when(days[dayIndex - 1]?.notes, () => html`
 					<s-note>
 						<label>Note</label>
 						<div>
-							${ days[dayIndex]!.notes }
+							${ days[dayIndex - 1]!.notes }
 						</div>
 					</s-note>
 					`) }

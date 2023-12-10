@@ -391,7 +391,7 @@ export class CampaignInventory extends MimicElement {
 			display: grid;
 			grid-template-columns: 1fr max-content max-content;
 			align-items: center;
-			gap: 12px;
+			gap: 8px;
 		}
 		.add-button {
 			margin-top: 24px;
